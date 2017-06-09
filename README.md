@@ -1,6 +1,6 @@
 # Draft EOS Token Sale Contract 
 
-***Everything contained in this repository is in draft form and subject to change at any time and provided for information purposes only.  block.one does not guarantee the accuracy of the information contained in this repository and the information is provided “as is” with no representations or warranties, express or implied. This code is owned and copyrighted by block.one and cannot be used by anyone for any purpose.***
+***Everything contained in this repository is in draft form and subject to change at any time and provided for information purposes only.  block.one does not guarantee the accuracy of the information contained in this repository and the information is provided “as is” with no representations or warranties, express or implied. This code is owned and copyrighted by block.one and cannot be used by anyone for any purpose other than testing on the Etheruem test network.***
 
 This repository contains the draft source code for the EOS Token Sale. It is being released so that it may be reviewed by the community and deployed and tested by all on the Ethereum test network.
 
