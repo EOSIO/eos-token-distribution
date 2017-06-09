@@ -1,0 +1,24 @@
+[submodule "lib/ds-test"]
+	path = lib/ds-test
+	url = https://github.com/dapphub/ds-test
+[submodule "lib/ds-auth"]
+	path = lib/ds-auth
+	url = https://github.com/dapphub/ds-auth
+[submodule "lib/ds-math"]
+	path = lib/ds-math
+	url = https://github.com/dapphub/ds-math
+[submodule "lib/ds-note"]
+	path = lib/ds-note
+	url = https://github.com/dapphub/ds-note
+[submodule "lib/ds-multisig"]
+	path = lib/ds-multisig
+	url = https://github.com/dapphub/ds-multisig
+[submodule "lib/ds-token"]
+	path = lib/ds-token
+	url = https://github.com/dapphub/ds-token
+[submodule "lib/ds-exec"]
+	path = lib/ds-exec
+	url = https://github.com/dapphub/ds-exec
+[submodule "lib/ds-guard"]
+	path = lib/ds-guard
+	url = https://github.com/dapphub/ds-guard

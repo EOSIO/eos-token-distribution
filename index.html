@@ -1,0 +1,108 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>EOS Token Sale Console</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
+
+    <style>
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+        }
+
+        input {
+            height: 2.2em;
+            width: 20em;
+            padding: 0 .3em;
+        }
+
+        #action-container {
+            display: flex;
+        }
+
+        .action {
+            margin: 0 20px 0 0;
+        }
+
+        .action button {
+            display: block;
+            height: 2em;
+            width: 5em;
+            font-size: 1.2em;
+        }
+
+        .action .input-group {
+            margin: 10px 0;
+        }
+
+
+    </style>
+</head>
+
+<body>
+
+    <div id="application-wrapper">
+        <h2>EOS Token Sale Console</h2>
+        <div>
+            <div>
+                <span>Day: </span> <span id="day"></span>
+            </div>
+            <div>
+                <span>Tokens Available For Window: </span> <span id="window-available"></span>
+            </div>
+            <div>
+                <span>Contributions For Window: </span> <span id="window-contribution"></span>
+            </div>
+        </div>
+
+        <div>
+            <span>Your EOS Balance:</span> <span id="eos-balance"></span>
+        </div>
+
+        <div id="action-container">
+            <div class="action">
+                <h4>Buy EOS</h4>
+                <div class="input-group">
+                    <div>Amount</div>
+                    <input type="text" placeholder="0.00 ETH">
+                </div>
+                <button>Buy</button>
+            </div>
+            <div class="action">
+                <h4>Claim EOS</h4>
+                <div class="input-group">
+                    <div>Address</div>
+                    <input type="text" placeholder="0x123">
+                </div>
+                <button>Claim</button>
+            </div>
+            <div class="action">
+                <h4>Transfer EOS</h4>
+                <div class="input-group">
+                    <div>Amount</div>
+                    <input type="text" placeholder="0.00 EOS">
+                </div>
+                <div class="input-group">
+                    <div>Destination Address</div>
+                    <input type="text" placeholder="0x123">
+                </div>
+                <button>Transfer</button>
+            </div>
+            <div class="action">
+                <h4>Register Public Key</h4>
+                <div class="input-group">
+                    <div>Public Key</div>
+                    <input type="text" placeholder="key">
+                </div>
+                <button>Register</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
