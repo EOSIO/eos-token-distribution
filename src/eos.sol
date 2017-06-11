@@ -66,7 +66,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
         buy();
     }
 
-    function buy( uint timestamp, uint limit ) {
+    function buy( uint timestamp, uint limit ) note payable {
         assert( 0.01 ether <= msg.value && msg.value <= 1000 ether ); // min / max 
         assert( today() <= numberOfDays );
         assert( dayFor(timestamp) == today() );
