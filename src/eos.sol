@@ -66,9 +66,13 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
         buy();
     }
 
-    function buy() note payable {
+    function buy( uint timestamp, uint limit ) {
         assert( 0.01 ether <= msg.value && msg.value <= 1000 ether ); // min / max 
         assert( today() <= numberOfDays );
+        assert( dayFor(timestamp) == today() );
+
+        if( limit ) assert( dailyTotals[today()] + msg.value < limit );
+
         userBuys[today()][msg.sender] += msg.value;
         dailyTotals[today()] += msg.value;
 
@@ -82,6 +86,10 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
             keys[msg.sender] = key;
             LogRegister(msg.sender, key);
         }
+    }
+
+    function buy() note payable {
+       buy( time(), 0 );
     }
 
     // This will have small rounding errors, but the token is going to be
