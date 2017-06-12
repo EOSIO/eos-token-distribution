@@ -116,7 +116,7 @@ This README assumes you have an Ethereum blockchain client installed. If you don
 You will need the [Nix Package Manager](https://nixos.org/nix/) to work with the EOS contracts from the command line. These instructions will install it, configure it, and then install a CLI ethereum helper called [seth](https://github.com/dapphub/seth)
 
     $ curl https://nixos.org/nix/install | sh
-    $ nix-channel --add https://nix.dapphub.com/pkgs/dapphub`
+    $ nix-channel --add https://nix.dapphub.com/pkgs/dapphub
     $ nix-channel --update
     $ nix-env -i seth
 
