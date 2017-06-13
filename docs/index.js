@@ -48,8 +48,8 @@ onload = () => {
 
           </p>
 
-          For more details, please review the token sale contract&rsquo;s <a
-          href=https://github.com/eosio/eos-token-sale>source
+          For more details, please review the token sale <a
+          href=https://github.com/eosio/eos-token-sale>contract source
           code</a>.
 
           <div class=pane>
@@ -72,11 +72,25 @@ onload = () => {
                 </tr>
                 <tr>
                   <th>Token balances</th>
-                  <td style="text-align: left">0.0 EOS</td>
+                  <td style="text-align: left">0.0 ETH</td>
                 </tr>
                 <tr>
                   <th></th>
-                  <td style="text-align: left">0.0 ETH</td>
+                  <td style="text-align: left">
+                    0.0 EOS
+                    <a href=# style="margin-left: 1rem; float: right">
+                      Transfer EOS tokens
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <th></th>
+                  <td style="text-align: left">
+                    0.0 EOS (unclaimed)
+                    <a href=# style="margin-left: 1rem; float: right">
+                      Claim EOS tokens
+                    </a>
+                  </td>
                 </tr>
               </table>
             ` : `
