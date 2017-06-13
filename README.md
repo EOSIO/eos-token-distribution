@@ -20,9 +20,11 @@ For example:
     Bob contributed 80% of the total contributions and gets 16 EOS
     Alice contributed 20% of the total contributions and gets 4 EOS
 
-At the start of the sale, 20% of the total minted tokens (200,000,000 EOS) will become available during a 5 day window. 
+At the start of the sale, 20% of the total minted tokens (200,000,000 EOS) will become available during a 5 day window from the time the contract is published.
 
-The remaining 800,000,000 EOS will then be split evenly into 360 one-day windows of 2,222,222.222222 EOS tokens each.
+The remaining 700,000,000 EOS will then be split evenly into 350 consecutive 23 hour windows of 2,000,000 EOS tokens each.
+
+10% or 100,000,000 EOS will be reserved for the founders and cannot be traded or transferred. 
 
 #### 369 days after the creation of this contract the EOS ERC-20 token will be frozen and non transferrable.
 
@@ -32,7 +34,7 @@ The remaining 800,000,000 EOS will then be split evenly into 360 one-day windows
 When designing the EOS distribution system, the primary goal was ensuring as fair and wide of a distribution as possible; we aim to achieve this by focusing on the following three objectives:
 
 ### 1. Equal Opportunity
-In order to ensure that everyone can participate, EOS are not sold for a fixed price; they are sold at a price determined by market demand for their acquisition. This is achieved by distributing a fixed amount of EOS (supply) proportionally toward the daily ETH proceeds (demand).
+In order to ensure that everyone can participate, EOS are not sold for a fixed price; they are sold at a price determined by market demand for their acquisition. This is achieved by distributing a fixed amount of EOS (supply) proportionally toward the daily ETH proceeds (demand). Each window is 23 hours long which means that everyone in every timezone will have periodic opportunities to have favorable start and/or end times for a window regardless of their timezone.
 
 ### 2. Broad Awareness
 Distribution can only be as wide as the number of people that are aware of the ability to get involved. By stretching the distribution process out over the course of approximately 1 year, the community has the time to gather information and assess project merits before early stage windows of opportunity are closed.
@@ -46,7 +48,41 @@ An Ethereum smart contract proves the receipt of incoming value for the creation
  - Eliminates unfair advantages associated with economies of scale
 
 
-## How To Participate
+## Technical Risks
+
+This smart contract runs on the Ethereum network; therefore, you need to be aware of certain things.
+
+### 1. Block Production occurs at Random Times
+
+The block time is used to determine the window a transaction is credited to. The timing of block production is determined via proof of work so transactions submitted in the final second of a window may not get included when you think.  To mitigate this, it is possible to use the interface to require the transaction to apply it to the current day or fail.
+
+### 2. Network Congestion 
+
+The Ethereum network is prone to periodic congestion during which transactions can be delayed or lost. Some individuals may intentionally spam the Ethereum network in an attempt to gain an advantage. Do not assume Ethereum block producers will include your transaction when you want or that your tranasction will be included at all. This is a limitation of Ethereum and not the EOS Token Sale contract.
+
+### 3. Do not fund Token Sale Contract from an account you do not control
+
+Tokens are allocated to the account that sent them. If you send from an exchange or other account that you do not control then you may not be able to claim your EOS tokens without their help.
+
+### 4. Failing register a public key for your Ethereum account
+
+If you hold EOS tokens in an Etheruem account and fail to register a public key or lose the private key that maps to your registered public key, then your EOS tokens will not be part of the snapshot.
+
+
+## FAQ
+
+### 1. How do I participate?
+
+The EOS Token Sale has not yet been started, but you can participate in our test sale now.  
+
+The recommend way to participate in the EOS Token Sale contract is to use [our interface](https://eosio.github.io/eos-token-sale/) with the [Metamask Extension](https://metamask.io) in the Google Chrome browser. 
+
+### 2. Why are tokens frozen after a year?
+
+The ERC-20 token is frozen so that there is not a moving target for generating a snapshot for generation of genesis block of an EOS.IO based blockchain. It also protects exchanges from people attempting to deposit or withdraw EOS ERC-20 tokens after the snapshot.
+
+
+## Advanced Participation
 
 To participate in the EOS token sale, simply send ETH to the contract address during a window of your choice. 
 
