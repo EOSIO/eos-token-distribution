@@ -26,7 +26,27 @@ The remaining 800,000,000 EOS will then be split evenly into 360 one-day windows
 
 #### 369 days after the creation of this contract the EOS ERC-20 token will be frozen and non transferrable.
 
-## To Participate
+
+## Rationale 
+
+When designing the EOS distribution system, the primary goal was ensuring as fair and wide of a distribution as possible; we aim to achieve this by focusing on the following three objectives:
+
+### 1. Equal Opportunity
+In order to ensure that everyone can participate, EOS are not sold for a fixed price; they are sold at a price determined by market demand for their acquisition. This is achieved by distributing a fixed amount of EOS (supply) proportionally toward the daily ETH proceeds (demand).
+
+### 2. Broad Awareness
+Distribution can only be as wide as the number of people that are aware of the ability to get involved. By stretching the distribution process out over the course of approximately 1 year, the community has the time to gather information and assess project merits before early stage windows of opportunity are closed.
+
+### 3. Fair and Auditable Incoming Value
+An Ethereum smart contract proves the receipt of incoming value for the creation of each EOS token. This process:
+
+ - Mimics the economics and distribution access of traditional PoW mining contributions
+ - Preserves the value lost to hardware and electricity for PoW
+ - Makes it easy for everyone to participate
+ - Eliminates unfair advantages associated with economies of scale
+
+
+## How To Participate
 
 To participate in the EOS token sale, simply send ETH to the contract address during a window of your choice. 
 
