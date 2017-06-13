@@ -20,13 +20,13 @@ For example:
     Bob contributed 80% of the total contributions and gets 16 EOS
     Alice contributed 20% of the total contributions and gets 4 EOS
 
-At the start of the sale, 20% of the total minted tokens (200,000,000 EOS) will become available during a 5 day window from the time the contract is published.
+### Example Distribution Schedule
 
-The remaining 700,000,000 EOS will then be split evenly into 350 consecutive 23 hour windows of 2,000,000 EOS tokens each.
+1. 200,000,000 EOS (20%) will be available during a 5 day window from the time the contract is published.
+2. 700,000,000 EOS (30%) will be split evenly into 350 consecutive 23 hour windows of 2,000,000 EOS tokens each starting after the initial window.
+3. 100,000,000 EOS (10%) will be reserved for the founders and cannot be traded or transferred on the Ethereum network.
 
-10% or 100,000,000 EOS will be reserved for the founders and cannot be traded or transferred. 
-
-#### 369 days after the creation of this contract the EOS ERC-20 token will be frozen and non transferrable.
+#### 341 days after the creation of this contract the EOS ERC-20 token will be frozen and non transferrable.
 
 
 ## Rationale 
