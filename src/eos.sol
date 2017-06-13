@@ -146,6 +146,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
 
     // Crowdsale owners can collect any time
     function collect() note auth {
+        assert( today() > 0 ); /// provably prevent any possible recycling during day 0
         exec(msg.sender, this.balance);
         LogCollect(this.balance);
     }
