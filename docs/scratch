@@ -1,0 +1,38 @@
+  <div id=action-container>
+    <div class=action>
+      <h4>Buy EOS</h4>
+      <div class=input-group>
+        <div>Contribution (in ETH)</div>
+        <input id=buy-input type=text placeholder=0.00>
+      </div>
+      <button onClick="buy()">Buy</button>
+    </div>
+    <div class=action>
+      <h4>Claim EOS</h4>
+      <div class=input-group style="visibility: hidden">
+        <div>Address</div>
+        <input type=text id=claim-input placeholder=0x1234>
+      </div>
+      <button onClick="claim()">Claim</button>
+    </div>
+    <div class=action>
+      <h4>Transfer EOS</h4>
+      <div class=input-group>
+        <div>Amount (in EOS)</div>
+        <input type=text id=transfer-amount-input placeholder=0.00>
+      </div>
+      <div class=input-group>
+        <div>Destination Address</div>
+        <input type=text id=transfer-address-input placeholder=0x1234>
+      </div>
+      <button onClick="transfer()">Transfer</button>
+    </div>
+    <div class=action>
+      <h4>Register Public Key</h4>
+      <div class=input-group>
+        <div>Public Key</div>
+        <input type=text id=register-input placeholder=0x1234>
+      </div>
+      <button onClick="register()">Register</button>
+    </div>
+  </div>
