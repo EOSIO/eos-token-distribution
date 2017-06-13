@@ -1,0 +1,8 @@
+html { font: 12pt/1.5 "Open Sans", sans-serif; }
+body { display: flex; justify-content: center; }
+body > * { width: 1024px; }
+.pane { border: 1px solid #ccc; padding: 1.5rem 2rem; }
+.pane { margin: 1.5rem 0; border-left: none; border-right: none; }
+h3 { margin: 0 0 .75rem; }
+table { text-align: right; border-collapse: collapse; }
+td, th { padding: .25rem 1rem; }
