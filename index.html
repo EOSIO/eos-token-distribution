@@ -43,6 +43,121 @@
 
 
     </style>
+
+    <script>
+
+        var sale_abi = [{"constant":true,"inputs":[{"name":"","type":"uint256"},{"name":"","type":"address"}],"name":"claimed","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"owner_","type":"address"}],"name":"setOwner","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"who","type":"address"}],"name":"claim","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"},{"name":"","type":"address"}],"name":"userBuys","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"day","type":"uint256"}],"name":"createOnDay","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"freeze","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"keys","outputs":[{"name":"","type":"bytes"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"startTime","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"authority_","type":"address"}],"name":"setAuthority","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"dailyTotals","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"key","type":"bytes"}],"name":"register","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"buy","outputs":[],"payable":true,"type":"function"},{"constant":true,"inputs":[],"name":"EOS","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"today","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"authority","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"createFirstDay","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"timestamp","type":"uint256"}],"name":"dayFor","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"day","type":"uint256"},{"name":"who","type":"address"}],"name":"claim","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"timestamp","type":"uint256"},{"name":"limit","type":"uint256"}],"name":"buyWithLimit","outputs":[],"payable":true,"type":"function"},{"constant":false,"inputs":[],"name":"collect","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"numberOfDays","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"createPerDay","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"inputs":[{"name":"numberOfDays_","type":"uint256"},{"name":"totalSupply_","type":"uint128"},{"name":"startTime_","type":"uint256"}],"payable":false,"type":"constructor"},{"payable":true,"type":"fallback"},{"anonymous":false,"inputs":[{"indexed":false,"name":"day","type":"uint256"},{"indexed":false,"name":"who","type":"address"},{"indexed":false,"name":"wad","type":"uint256"}],"name":"LogClaim","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"wad","type":"uint256"}],"name":"LogCollect","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"who","type":"address"},{"indexed":false,"name":"key","type":"bytes"}],"name":"LogRegister","type":"event"},{"anonymous":true,"inputs":[{"indexed":true,"name":"sig","type":"bytes4"},{"indexed":true,"name":"guy","type":"address"},{"indexed":true,"name":"foo","type":"bytes32"},{"indexed":true,"name":"bar","type":"bytes32"},{"indexed":false,"name":"wad","type":"uint256"},{"indexed":false,"name":"fax","type":"bytes"}],"name":"LogNote","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"authority","type":"address"}],"name":"LogSetAuthority","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"}],"name":"LogSetOwner","type":"event"}];
+
+        var token_abi = [{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"bytes32"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"stop","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"guy","type":"address"},{"name":"wad","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"owner_","type":"address"}],"name":"setOwner","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"src","type":"address"},{"name":"dst","type":"address"},{"name":"wad","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"dst","type":"address"},{"name":"wad","type":"uint128"}],"name":"push","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"name_","type":"bytes32"}],"name":"setName","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"wad","type":"uint128"}],"name":"mint","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"src","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"stopped","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"authority_","type":"address"}],"name":"setAuthority","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"src","type":"address"},{"name":"wad","type":"uint128"}],"name":"pull","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"wad","type":"uint128"}],"name":"burn","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"bytes32"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"dst","type":"address"},{"name":"wad","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"start","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"authority","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"src","type":"address"},{"name":"guy","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"inputs":[{"name":"symbol_","type":"bytes32"}],"payable":false,"type":"constructor"},{"anonymous":true,"inputs":[{"indexed":true,"name":"sig","type":"bytes4"},{"indexed":true,"name":"guy","type":"address"},{"indexed":true,"name":"foo","type":"bytes32"},{"indexed":true,"name":"bar","type":"bytes32"},{"indexed":false,"name":"wad","type":"uint256"},{"indexed":false,"name":"fax","type":"bytes"}],"name":"LogNote","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"authority","type":"address"}],"name":"LogSetAuthority","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"}],"name":"LogSetOwner","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"spender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Approval","type":"event"}];
+
+        var sale_address_kovan = "0x584483282cfcad032eb5ff6c03260a079ab5fbc8"; 
+
+        var token_address_kovan = "0x3b06e4e45ccc45ee21e276462ab07e8581fcf0e6";
+
+        const WAD = 1000000000000000000;
+
+        const sale_notes = {
+            "0xa6f2ae3a": "buy",
+            "0x1e83409a": "claim",
+
+        };
+
+        function updateDailyInfo() {
+            sale.dailyTotals(today, function(errDailyTotal, dailyTotal) {
+                let dailyTotalDecimal = dailyTotal.div(WAD);
+                document.getElementById("window-contribution").innerHTML = dailyTotalDecimal.toNumber() + " ETH";
+
+                sale.createOnDay(today, function(errCreateOnDay,createToday) {
+                    let createTodayDecimal = createToday.div(WAD);
+                    document.getElementById("window-available").innerHTML = createTodayDecimal.toNumber() + " EOS";
+
+                    var price = createTodayDecimal.div(dailyTotalDecimal);
+                    document.getElementById("window-price").innerHTML = price.toNumber() + " EOS/ETH";
+                });
+            });
+        }
+
+        function updateBalance() {
+            token.balanceOf(web3.eth.accounts[0], function(err, res) {
+                document.getElementById("eos-balance").innerHTML = res.div(WAD).toNumber() + " EOS";
+            });   
+        }
+
+        window.addEventListener('load', function() {
+            // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+            if (typeof web3 !== 'undefined') {
+                // Use Mist/MetaMask's provider
+                window.web3 = new Web3(web3.currentProvider);
+                sale = web3.eth.contract(sale_abi).at(sale_address_kovan);
+                token = web3.eth.contract(token_abi).at(token_address_kovan);
+                
+                sale.today(function(err, res) {
+                    today = res.toNumber();
+
+                    document.getElementById("day").innerHTML = today + 1;
+
+                    updateDailyInfo();
+
+                    updateBalance();
+                    
+                });
+
+                sale.LogNote(function(err,res) {
+
+                    let sig = sale_notes[res.args.sig];
+
+                    if (sig == "buy") {
+                        updateDailyInfo();
+                    } else if (sig == "claim" && res.args.guy == web3.eth.accounts[0]) {
+                        updateBalance();
+                    }
+                });
+
+                token.Transfer(function (err, res) {
+                    if (res.args.to == web3.eth.accounts[0] || 
+                        res.args.from == web3.eth.accounts[0]) {
+                        updateBalance();
+                    }
+                });
+
+
+            } else {
+                console.log('No web3? You should consider trying MetaMask!')
+                // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
+                window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+            }
+        });
+
+        function buy() {
+            let wad = document.getElementById("buy-input").value;
+            sale.buy({value: web3.toWei(wad)}, function(err, res) {
+                console.log(res);
+            });
+        }
+
+        function claim() {
+            let address = document.getElementById("claim-input").value;
+            sale.claim(address, function(err, res) {
+                console.log(res);
+            });
+        }
+
+        function transfer() {
+            let wad = document.getElementById("transfer-amount-input").value;
+            let address = document.getElementById("transfer-address-input").value;
+            token.transfer(address, wad, function(err, res) {
+                console.log(res);
+            });
+        }
+
+        function register() {
+            let key = document.getElementById("register-input").value;
+            sale.register(key, function(err, res) {
+                console.log(err || res);
+            });
+        }
+
+    </script>
 </head>
 
 <body>
@@ -59,6 +174,9 @@
             <div>
                 <span>Contributions For Window: </span> <span id="window-contribution"></span>
             </div>
+            <div>
+                <span>Effective EOS Price: </span> <span id="window-price"></span>
+            </div>
         </div>
 
         <div>
@@ -70,37 +188,37 @@
                 <h4>Buy EOS</h4>
                 <div class="input-group">
                     <div>Amount</div>
-                    <input type="text" placeholder="0.00 ETH">
+                    <input id="buy-input" type="text" placeholder="0.00 ETH">
                 </div>
-                <button>Buy</button>
+                <button onClick="buy()">Buy</button>
             </div>
             <div class="action">
                 <h4>Claim EOS</h4>
                 <div class="input-group">
                     <div>Address</div>
-                    <input type="text" placeholder="0x123">
+                    <input id="claim-input" type="text" placeholder="0x123">
                 </div>
-                <button>Claim</button>
+                <button onClick="claim()">Claim</button>
             </div>
             <div class="action">
                 <h4>Transfer EOS</h4>
                 <div class="input-group">
                     <div>Amount</div>
-                    <input type="text" placeholder="0.00 EOS">
+                    <input id="transfer-amount-input" type="text" placeholder="0.00 EOS">
                 </div>
                 <div class="input-group">
                     <div>Destination Address</div>
-                    <input type="text" placeholder="0x123">
+                    <input id="transfer-address-input" type="text" placeholder="0x123">
                 </div>
-                <button>Transfer</button>
+                <button onClick="transfer()">Transfer</button>
             </div>
             <div class="action">
                 <h4>Register Public Key</h4>
                 <div class="input-group">
                     <div>Public Key</div>
-                    <input type="text" placeholder="key">
+                    <input id="register-input" type="text" placeholder="key">
                 </div>
-                <button>Register</button>
+                <button onClick="register()">Register</button>
             </div>
         </div>
     </div>
