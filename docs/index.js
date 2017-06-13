@@ -34,17 +34,11 @@ onload = () => {
         })
       }, (error, days) => {
         render("app", `
-          <h2>EOS token sale</h2>
+          <h2>EOS Token Sale</h2>
 
           <p>
 
-            The EOS token sale will be conducted on a continuous
-            distribution model during 1 year. One billion tokens
-            (1,000,000,000 EOS) will be minted at the start of the
-            sale. These tokens are then split into separate windows of
-            availability &mdash; one per day. The tokens
-            allocated to a given window are split proportionally to
-            all contributions made during that period.
+The EOS Token Sale will distributed daily over about 341 days. 1,000,000,000 (one billion) EOS tokens will be minted at the start of the sale. These tokens will be split into different rolling windows of availability. The tokens available in a window will be split proportional to all contributions made during the window period. 
 
           </p>
 

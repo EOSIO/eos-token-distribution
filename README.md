@@ -10,7 +10,7 @@ This repository contains the draft source code for the EOS Token Sale. It is bei
 
 This draft contract manages the sale of a ERC-20 compatible token ("EOS") on the Ethereum (ETH) blockchain.
 
-The EOS Token sale will be conducted on a continuous distribution model for 1 year. 1,000,000,000 (one billion) EOS tokens will be minted at the start of the sale. These tokens will be split into different rolling windows of availability. The tokens for a window will be split proportional to all contributions made during the window period. 
+The EOS Token Sale will distributed daily over about 341 days. 1,000,000,000 (one billion) EOS tokens will be minted at the start of the sale. These tokens will be split into different rolling windows of availability. The tokens available in a window will be split proportional to all contributions made during the window period. 
 
 For example:
 
