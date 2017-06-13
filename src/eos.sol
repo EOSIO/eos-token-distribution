@@ -38,6 +38,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
         foundersAllocation = foundersAlloc_;
 
         /// TODO: transfer foundersAllocation of EOS ERC-20 tokens to founders address and map to founders public key
+        /// founders ETH address needs to be a provably non-transferrable address
 
 
         createFirstDay     = wmul(totalSupply_, 0.2 ether);
