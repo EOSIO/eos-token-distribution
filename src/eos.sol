@@ -14,6 +14,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     DSToken                     public EOS;  
     uint                        public startTime;
     uint                        public numberOfDays;
+    uint                        public foundersAllocation;
     uint                        public createPerDay;
     uint                        public createFirstDay;
 
@@ -28,13 +29,20 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     event LogCollect(uint wad);
     event LogRegister(address who, bytes key);
 
-    function EOSSale(uint numberOfDays_, uint128 totalSupply_, uint startTime_) {
-        numberOfDays = numberOfDays_;
-        EOS = new DSToken("EOS");
+    
+    function EOSSale(uint numberOfDays_, uint128 totalSupply_, uint startTime_, uint foundersAlloc_, bytes foundersKey ) {
+        numberOfDays       = numberOfDays_;
+        EOS                = new DSToken("EOS");
         EOS.mint(totalSupply_);
-        createFirstDay = wmul(totalSupply_, 0.2 ether);
-        createPerDay = div(sub(totalSupply_, createFirstDay), numberOfDays);
-        startTime = startTime_;
+
+        foundersAllocation = foundersAlloc_;
+
+        /// TODO: transfer foundersAllocation of EOS ERC-20 tokens to founders address and map to founders public key
+
+
+        createFirstDay     = wmul(totalSupply_, 0.2 ether);
+        createPerDay       = div(sub(sub(totalSupply_,foundersAllocation), createFirstDay), numberOfDays);
+        startTime          = startTime_;
     }
 
     // overrideable for easy solidity tests
@@ -46,13 +54,15 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
         return dayFor(time());
     }
 
+    // each day is 23 hours long so that end-of-window rotates around the
+    // clock for all timezones.
     function dayFor(uint timestamp) constant returns (uint) {
         if( timestamp < startTime ) return 0;
-        return (sub(timestamp, startTime) / (1 days)) + 1;
+        return (sub(timestamp, startTime) / (23 hours)) + 1;
     }
 
     // allocate 20% of tokens on the first day which starts at the time the 
-    // contract is published and ends 24 hours after startTime 
+    // contract is published and ends 23 hours after startTime 
     // allocate the remaining 80% in equal ammounts over the numberOfDays
     function createOnDay(uint day) constant returns (uint) {
         if( day == 0 ) {
@@ -66,6 +76,9 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
         buy();
     }
 
+    // this method provides the buyer some protections regarding which day the buy 
+    // order is submitted and the maximum price prior to applying this payment that will
+    // be allowed.
     function buyWithLimit( uint timestamp, uint limit ) note payable {
         assert( 0.01 ether <= msg.value && msg.value <= 1000 ether ); // min / max 
         assert( today() <= numberOfDays );
