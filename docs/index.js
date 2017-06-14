@@ -24,7 +24,7 @@ function lament(error) {
 }
 
 function showPane(name) {
-  for (var x of "transfer buy".split(" ")) {
+  for (var x of "transfer buy register".split(" ")) {
     try {
       show(`${x}-link`)
       hide(`${x}-pane`)
@@ -55,8 +55,10 @@ onload = () => setTimeout(() => {
       }, web3.eth.accounts[0] ? {
         eth_balance: $ => web3.eth.getBalance(web3.eth.accounts[0], $),
         eos_balance: $ => eos_token.balanceOf(web3.eth.accounts[0], $),
+        publicKey: $ => eos_sale.keys(web3.eth.accounts[0], $),
       } : {}), hopefully(({
-        today, days, startTime, eth_balance, eos_balance
+        today, days, startTime,
+        eth_balance, eos_balance, publicKey,
       }) => {
         var startMoment = moment(Number(startTime) * 1000)
         async.map(iota(Number(days) + 1), (i, $) => {
@@ -150,23 +152,32 @@ onload = () => setTimeout(() => {
                 <table>
                   <tr>
                     <th>Ethereum account</th>
-                    <td style="width: 40rem; text-align: left">
+                    <td style="width: 42rem; text-align: left">
                       <code>${web3.eth.accounts[0]}</code>
                     </td>
                   </tr>
-                  ${eos_balance.equals(0) ? "" : `
-                    <tr>
-                      <th>EOS public key</th>
-                      <td style="text-align: left">
+                  <tr>
+                    <th>EOS public key</th>
+                    <td style="text-align: left">
+                      ${publicKey ? `
+                        <code>${publicKey}</code>
+                        <a href=# id=register-link style="float: right"
+                           onclick="showPane('register'),
+                                    event.preventDefault()">
+                          Change your EOS key
+                        </a>
+                      ` : `
                         <span style="color: gray">
                           (no EOS public key registered)
                         </span>
-                        <a href=# style="float: right">
+                        <a href=# id=register-link style="float: right"
+                           onclick="showPane('register'),
+                                    event.preventDefault()">
                           Register your EOS key
                         </a>
-                      </td>
-                    </tr>
-                  `}
+                      `}
+                    </td>
+                  </tr>
                   <tr>
                     <th>Token balances</th>
                     <td style="text-align: left">
@@ -212,6 +223,28 @@ onload = () => setTimeout(() => {
                   `}
                 </table>
               </div>
+              <form class="hidden pane" id=register-pane
+                    onsubmit="register(), event.preventDefault()">
+                <h3>${publicKey ? "Change" : "Register"} EOS public key</h3>
+                <table>
+                  <tr>
+                    <th>Public key</th>
+                    <td style="text-align: left">
+                      <input value=${escape(publicKey)}
+                             id=register-input required
+                             style="width: 30em">
+                      <span style="margin-left: 1rem">
+                        <button id=register-button>
+                          ${publicKey ? "Change" : "Register"} key
+                        </button>
+                        <span id=register-progress class=hidden>
+                          Registering key...
+                        </span>
+                      </span>
+                    </td>
+                  </tr>
+                </table>
+              </form>
               <form class="hidden pane" id=buy-pane
                     onsubmit="buy(), event.preventDefault()">
                 <h3>Buy EOS tokens &mdash; sale window #${today}</h3>
@@ -346,8 +379,10 @@ function transfer() {
 }
 
 function register() {
+  byId("register-button").classList.add("hidden")
+  byId("register-progress").classList.remove("hidden")
   var key = getValue("register-input")
-  sale.register(key, (error, result) => {
-    console.log(error || result)
-  })
+  eos_sale.register(key, hopefully(result => {
+    setTimeout(() => location.reload(), 10000)
+  }))
 }
