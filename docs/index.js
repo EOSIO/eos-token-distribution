@@ -29,6 +29,16 @@ function updateBalance() {
   })
 }
 
+function showPane(name) {
+  for (var x of "transfer buy".split(" ")) {
+    show(`${x}-link`)
+    hide(`${x}-pane`)
+  }
+
+  show(`${name}-pane`)
+  hide(`${name}-link`)
+}
+
 onload = () => setTimeout(() => {
   if (!window.web3) {
     document.body.innerHTML = `
@@ -39,25 +49,39 @@ onload = () => setTimeout(() => {
     eos_sale  = web3.eth.contract(eos_sale_abi).at(eos_sale_address_kovan)
     eos_token = web3.eth.contract(eos_token_abi).at(eos_token_address_kovan)
 
+    var time = Math.round(new Date().getTime() / 1000)
+
     async.parallel(Object.assign({
+      today: $ => eos_sale.dayFor(time, $),
       days: $ => eos_sale.numberOfDays($),
+      startTime: $ => eos_sale.startTime($),
     }, web3.eth.accounts[0] ? {
       eth_balance: $ => web3.eth.getBalance(web3.eth.accounts[0], $),
-    } : {}), hopefully(({ eth_balance, days }) => {
-      async.map(iota(Number(days)), (i, $) => {
+      eos_balance: $ => eos_token.balanceOf(web3.eth.accounts[0], $),
+    } : {}), hopefully(({
+      today, days, startTime, eth_balance, eos_balance
+    }) => {
+      var startMoment = moment(Number(startTime) * 1000)
+      async.map(iota(Number(days) + 1), (i, $) => {
         var day = { id: i }
         eos_sale.createOnDay(day.id, hopefully(forSale => {
           eos_sale.dailyTotals(day.id, hopefully(contributions => {
-            day.name = day.id + 1
+            day.name = day.id
             day.tokensForSale = forSale.div(WAD)
             day.contributions = contributions.div(WAD)
             day.price = contributions.div(forSale)
+
+            if (day.id == 0) {
+              day.ends = startMoment
+            } else {
+              day.begins = startMoment.clone().add(23 * (day.id - 1), "hours")
+              day.ends = day.begins.clone().add(23, "hours")
+            }
+
             $(null, day)
           }))
         }))
       }, hopefully(days => render("app", `
-        <h1>EOS Token Sale</h1>
-
         <p>
 
           The EOS Token Sale will distributed daily over about 341
@@ -75,10 +99,49 @@ onload = () => setTimeout(() => {
 
         ${web3.eth.accounts[0] ? `
           <div class=pane>
+        <table style="width: 100%">
+          <thead>
+            <tr>
+              <th>Sale window</th>
+              <th>Tokens for sale</th>
+              <th>Total contributions</th>
+              <th>Your contribution</th>
+              <th>Effective price</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${days.map((day, i) => i > Number(today) ? `
+              <tr class=future>
+                <td>#${day.name}</td>
+                <td>${formatWad(day.tokensForSale)} EOS</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            ` : `
+              <tr ${i == Number(today) ? "class=active" : ""}>
+                <td>
+                  #${day.name}
+                  ${i == Number(today) ? "[active] " : ""}
+                </td>
+                <td>${formatWad(day.tokensForSale)} EOS</td>
+                <td>${formatWad(day.contributions)} ETH</td>
+                <td>${formatWad(day.contributions)} ETH</td>
+                <td>${day.contributions == 0 ? "n/a" : (
+                  `${day.price.toFixed(9)} ETH/EOS`
+                )}</td>
+              </tr>
+            `).join("\n")}
+          </tbody>
+        </table>
+        </div>
+          <div class=pane>
             <table>
               <tr>
                 <th>Ethereum account</th>
-                <td><code>${web3.eth.accounts[0]}</code></td>
+                <td style="width: 35rem; text-align: left">
+                  <code>${web3.eth.accounts[0]}</code>
+                </td>
               </tr>
               <tr>
                 <th>EOS public key</th>
@@ -86,7 +149,7 @@ onload = () => setTimeout(() => {
                   <span style="color: gray">
                     (no EOS public key registered)
                   </span>
-                  <a href=# style="margin-left: 1rem">
+                  <a href=# style="float: right">
                     Register your EOS key
                   </a>
                 </td>
@@ -97,7 +160,8 @@ onload = () => setTimeout(() => {
                   ${eth_balance.div(WAD)} ETH
                   <a href=# id=buy-link
                      style="margin-left: 1rem; float: right"
-                     onclick="show('buy-pane'), hide('buy-link')">
+                     onclick="showPane('buy'),
+                              event.preventDefault()">
                     Buy EOS tokens
                   </a>
                 </td>
@@ -105,18 +169,21 @@ onload = () => setTimeout(() => {
               <tr>
                 <th></th>
                 <td style="text-align: left">
-                  0.0 EOS
+                  ??? EOS (unclaimed)
                   <a href=# style="margin-left: 1rem; float: right">
-                    Transfer EOS tokens
+                    Claim EOS tokens
                   </a>
                 </td>
               </tr>
               <tr>
                 <th></th>
                 <td style="text-align: left">
-                  0.0 EOS (unclaimed)
-                  <a href=# style="margin-left: 1rem; float: right">
-                    Claim EOS tokens
+                  ${eos_balance.div(WAD)} EOS
+                  <a href=# id=transfer-link
+                     style="margin-left: 1rem; float: right"
+                     onclick="showPane('transfer'),
+                              event.preventDefault()">
+                    Transfer EOS tokens
                   </a>
                 </td>
               </tr>
@@ -125,38 +192,43 @@ onload = () => setTimeout(() => {
           <div class="hidden pane" id=buy-pane>
             <table>
               <tr>
-                <th>Currently active sale window</th>
+                <th style="text-align: left" colspan=2>
+                  <h3>Buy EOS tokens &mdash; sale window #${today}</h3>
+                </th>
+              </tr>
+              <tr>
+                <th>Timeframe</th>
                 <td style="text-align: left">
-                  <span style="margin-right: .5rem">#2</span>
-                  (started 5 hours ago; ends in 18 hours)
+                  ${days[Number(today)].begins ? `started ${days[today].begins.fromNow()}, ` : ""}
+                  ends ${days[Number(today)].ends.fromNow()}
                 </td>
               </tr>
               <tr>
-                <th>Tokens for sale in window</th>
+                <th>Tokens for sale</th>
                 <td style="text-align: left">
-                  ${formatWad(days[0].tokensForSale)} EOS
+                  ${formatWad(days[Number(today)].tokensForSale)} EOS
                 </td>
               </tr>
               <tr>
-                <th>Total contributions in window</th>
+                <th>Total contributions</th>
                 <td style="text-align: left">
-                  ${formatWad(days[0].contributions)} ETH
+                  ${formatWad(days[Number(today)].contributions)} ETH
                 </td>
               </tr>
               <tr>
-                <th>Your contribution in window</th>
+                <th>Your contribution</th>
                 <td style="text-align: left">
-                  ${formatWad(days[0].contributions)} ETH
+                  ${formatWad(days[Number(today)].contributions)} ETH
                 </td>
               </tr>
               <tr>
-                <th>Effective minimum price</th>
+                <th>Effective price</th>
                 <td style="text-align: left">
-                  ${days[0].price.toFixed(9)} ETH/EOS
+                  ${days[Number(today)].price.toFixed(9)} ETH/EOS
                 </td>
               </tr>
               <tr>
-                <th>Additional contribution</th>
+                <th>Add contribution</th>
                 <td style="text-align: left">
                   <form>
                     <input type=text required
@@ -166,6 +238,28 @@ onload = () => setTimeout(() => {
                       Buy EOS tokens
                     </button>
                   </form>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="hidden pane" id=transfer-pane>
+            <table>
+              <tr>
+                <th>Recipient account</th>
+                <td style="text-align: left">
+                  <input placeholder=0x0123456789abcdef0123456789abcdef01234567
+                         style="width: 100%">
+                </td>
+              </tr>
+              <tr>
+                <th>Transfer amount</th>
+                <td style="text-align: left">
+                  <input placeholder=${eos_balance.div(WAD)}
+                         style="width: 15em">
+                  EOS
+                  <button style="margin-left: 1rem">
+                    Transfer EOS tokens
+                  </button>
                 </td>
               </tr>
             </table>
@@ -181,33 +275,6 @@ onload = () => setTimeout(() => {
 
           </div>
         `}
-
-        <table style="width: 100%; margin-bottom: 2rem">
-          <thead>
-            <tr>
-              <th>Window</th>
-              <th>Tokens for sale</th>
-              <th>Total contributions</th>
-              <th>Your contribution</th>
-              <th>Effective price</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${days.map(day => {
-              return `
-                <tr>
-                  <td>#${day.name}</td>
-                  <td>${formatWad(day.tokensForSale)} EOS</td>
-                  <td>${formatWad(day.contributions)} ETH</td>
-                  <td>${formatWad(day.contributions)} ETH</td>
-                  <td>${day.contributions == 0 ? "n/a" : (
-                    `${day.price.toFixed(9)} ETH/EOS`
-                  )}</td>
-                </tr>
-              `
-            }).join("\n")}
-          </tbody>
-        </table>
       `)))
     }))
   }
