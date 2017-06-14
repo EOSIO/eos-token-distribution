@@ -3,7 +3,7 @@
 html { font: 12pt/1.5 "Open Sans", sans-serif; }
 body { display: flex; justify-content: center; }
 body > * { width: 1024px; }
-body { overflow-y: scroll; }
+body { overflow-y: scroll; min-height: 60rem; }
 .pane { border: 1px solid #ccc; padding: 1.5rem 2rem; }
 .pane { margin: 1.5rem 0; border-left: none; border-right: none; }
 .pane + .pane { border-top: none; margin-top: 0; padding-top: 0; }
