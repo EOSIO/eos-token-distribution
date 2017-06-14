@@ -245,6 +245,11 @@ onload = () => setTimeout(() => {
           <div class="hidden pane" id=transfer-pane>
             <table>
               <tr>
+                <th style="text-align: left" colspan=2>
+                  <h3>Transfer EOS tokens to another Ethereum account</h3>
+                </th>
+              </tr>
+              <tr>
                 <th>Recipient account</th>
                 <td style="text-align: left">
                   <input placeholder=0x0123456789abcdef0123456789abcdef01234567
