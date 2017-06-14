@@ -48,8 +48,6 @@ onload = () => setTimeout(() => {
     web3.eth.getBlock("latest", hopefully(block => {
       var time = block.timestamp
 
-      console.log(time)
-
       async.parallel(Object.assign({
         today: $ => eos_sale.dayFor(time, $),
         days: $ => eos_sale.numberOfDays($),
@@ -92,7 +90,7 @@ onload = () => setTimeout(() => {
             return i < Number(today) && !x.claimed
           }).reduce((a, x) => {
             return x.createOnDay.div(x.dailyTotal).times(x.userBuys).plus(a)
-          }, 0)
+          }, days[0].createOnDay.minus(days[0].createOnDay))
   
           render("app", `
             <p>
