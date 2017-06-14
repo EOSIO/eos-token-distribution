@@ -37,10 +37,10 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
 
         foundersAllocation = foundersAlloc_;
 
-        /// TODO: transfer foundersAllocation of EOS ERC-20 tokens to founders address and map to founders public key
-        /// founders ETH address needs to be a provably non-transferrable address
-        address founders; /// NULL address is provably not transferrable 
-        EOS.push(founders, foundersAllocation);
+        // TODO: transfer foundersAllocation of EOS ERC-20 tokens to founders address and map to founders public key
+        // founders ETH address needs to be a provably non-transferrable address
+        address founders; // NULL address is provably not transferrable 
+        EOS.push(founders, cast(foundersAllocation));
         keys[founders] = foundersKey;
         LogRegister(founders, foundersKey);
 
@@ -146,7 +146,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
 
     // Crowdsale owners can collect any time
     function collect() note auth {
-        assert( today() > 0 ); /// provably prevent any possible recycling during day 0
+        assert( today() > 0 ); // provably prevent any possible recycling during day 0
         exec(msg.sender, this.balance);
         LogCollect(this.balance);
     }

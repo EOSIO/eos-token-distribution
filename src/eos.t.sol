@@ -48,8 +48,8 @@ contract TestOwner {
 
 contract TestableEOSSale is EOSSale {
 
-    function TestableEOSSale( uint n, uint128 d, uint s )
-             EOSSale(n, d, s) {}
+    function TestableEOSSale( uint n, uint128 d, uint s, uint a, bytes k )
+             EOSSale(n, d, s, a, k) {}
     
     uint public localTime;
 
@@ -77,7 +77,8 @@ contract EOSSaleTest is DSTest, DSExec {
     uint window = 0;
 
     function setUp() {
-        sale = new TestableEOSSale(5, 156.25 ether, block.timestamp + 1 days);
+        bytes memory x = new bytes(1);
+        sale = new TestableEOSSale(5, 156.25 ether, block.timestamp + 1 days, 10 ether, x);
         sale.addTime(now + 1);
 
         EOS = sale.EOS();
@@ -135,7 +136,7 @@ contract EOSSaleTest is DSTest, DSExec {
         sale.addTime(1 days);
         sale.claim(1, this);
         // 25 tokens issued per day after first day
-        assertEq(EOS.balanceOf(this), 56.25 ether);
+        assertEq(EOS.balanceOf(this), 54.25 ether);
     }
 
     function testFailSaleOver() {
@@ -159,7 +160,7 @@ contract EOSSaleTest is DSTest, DSExec {
         nextRound(1 ether, 0, 0);
         nextRound(1 ether, 0, 0);
 
-        assertEq(EOS.balanceOf(this), 156.25 ether);
+        assertEq(EOS.balanceOf(this), 146.25 ether);
     }
 
     function testClaim() {
@@ -207,10 +208,9 @@ contract EOSSaleTest is DSTest, DSExec {
         addTime();
         window++;
 
-        nextRound(1 ether, 1 ether, 1 ether);
-        assertEq(EOS.balanceOf(this), 8333333333333333333);
-        assertEq(EOS.balanceOf(user1), 8333333333333333333);
-        assertEq(EOS.balanceOf(user2), 8333333333333333333);
+        nextRound(5 ether, 1 ether, 0);
+        assertEq(EOS.balanceOf(this), 19166666666666666665);
+        assertEq(EOS.balanceOf(user1), 3833333333333333333);
     }
 
     function testFreeze() {
@@ -220,7 +220,7 @@ contract EOSSaleTest is DSTest, DSExec {
         nextRound(1 ether, 0, 0);
         nextRound(1 ether, 0, 0);
         nextRound(1 ether, 0, 0);
-        assertEq(EOS.balanceOf(this), 156.25 ether);
+        assertEq(EOS.balanceOf(this), 146.25 ether);
 
         // one extra day to trade
         addTime();
@@ -235,7 +235,7 @@ contract EOSSaleTest is DSTest, DSExec {
         nextRound(1 ether, 0, 0);
         nextRound(1 ether, 0, 0);
         nextRound(1 ether, 0, 0);
-        assertEq(EOS.balanceOf(this), 156.25 ether);
+        assertEq(EOS.balanceOf(this), 146.25 ether);
 
         owner.doCollect();
         assertEq(owner.balance, 6 ether);
@@ -248,8 +248,8 @@ contract EOSSaleTest is DSTest, DSExec {
         nextRound(1 ether, 1 ether, 0);
         nextRound(1 ether, 1 ether, 0);
         nextRound(1 ether, 1 ether, 0);
-        assertEq(EOS.balanceOf(this), 78.125 ether);
-        assertEq(EOS.balanceOf(user1), 78.125 ether);
+        assertEq(EOS.balanceOf(this), 73.125 ether);
+        assertEq(EOS.balanceOf(user1), 73.125 ether);
         addTime();
 
         owner.doCollect();
@@ -265,9 +265,9 @@ contract EOSSaleTest is DSTest, DSExec {
         nextRound(1 ether, 12 ether, 12 ether);
         nextRound(12 ether, 1 ether, 12 ether);
         nextRound(12 ether, 12 ether, 1 ether);
-        assertEq(EOS.balanceOf(this), 74.375 ether);
-        assertEq(EOS.balanceOf(user1), 44.375 ether);
-        assertEq(EOS.balanceOf(user2), 37.5 ether);
+        assertEq(EOS.balanceOf(this), 70.675 ether);
+        assertEq(EOS.balanceOf(user1), 41.075 ether);
+        assertEq(EOS.balanceOf(user2), 34.5 ether);
         addTime();
 
         owner.doCollect();
@@ -304,7 +304,7 @@ contract EOSSaleTest is DSTest, DSExec {
         assertEq(EOS.balanceOf(this), 0);
 
         sale.claim(this);
-        assertEq(EOS.balanceOf(this), 81.25 ether);
+        assertEq(EOS.balanceOf(this), 77.25 ether);
     }
 
     function testClaimAllZeroContribution() {
@@ -319,7 +319,7 @@ contract EOSSaleTest is DSTest, DSExec {
         assertEq(EOS.balanceOf(this), 0);
 
         sale.claim(this);
-        assertEq(EOS.balanceOf(this), 81.25 ether);
+        assertEq(EOS.balanceOf(this), 77.25 ether);
     }
 
 
