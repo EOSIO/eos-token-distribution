@@ -71,7 +71,8 @@ onload = () => setTimeout(() => {
                 day.dailyTotal = dailyTotal.div(WAD)
                 day.userBuys = userBuys.div(WAD)
                 day.price = dailyTotal.div(createOnDay)
-  
+                day.received = day.createOnDay.div(day.dailyTotal).times(day.userBuys)
+
                 if (day.id == 0) {
                   day.ends = startMoment
                 } else {
@@ -90,12 +91,10 @@ onload = () => setTimeout(() => {
         }, hopefully(days => {
           var unclaimed = days.filter((x, i) => {
             return i < Number(today) && !x.claimed
-          }).reduce((a, x) => {
-            return x.createOnDay.div(x.dailyTotal).times(x.userBuys).plus(a)
-          }, days[0].createOnDay.minus(days[0].createOnDay))
+          }).reduce((a, x) => x.received.plus(a), web3.toBigNumber(0))
   
           render("app", `
-            <p>
+            <p style="width: 80%">
   
               The EOS Token Sale will distributed daily over about 341
               days.  1,000,000,000 (one billion) EOS tokens will be minted
@@ -116,9 +115,10 @@ onload = () => setTimeout(() => {
                   <thead>
                     <tr>
                       <th>Sale window</th>
-                      <th>Tokens for sale</th>
+                      <th>EOS for sale</th>
                       <th>Total contributions</th>
                       <th>Your contribution</th>
+                      <th>EOS received</th>
                       <th>Effective price</th>
                     </tr>
                   </thead>
@@ -135,11 +135,12 @@ onload = () => setTimeout(() => {
                       <tr ${i == Number(today) ? "class=active" : ""}>
                         <td>
                           #${day.name}
-                          ${i == Number(today) ? "(active) " : ""}
+                          ${i == Number(today) ? "(open) " : ""}
                         </td>
                         <td>${formatWad(day.createOnDay)} EOS</td>
                         <td>${formatWad(day.dailyTotal)} ETH</td>
                         <td>${formatWad(day.userBuys)} ETH</td>
+                        <td>${formatWad(day.received)} EOS</td>
                         <td>${day.dailyTotal == 0 ? "n/a" : (
                           `${day.price.toFixed(9)} ETH/EOS`
                         )}</td>
@@ -152,7 +153,7 @@ onload = () => setTimeout(() => {
                 <table>
                   <tr>
                     <th>Ethereum account</th>
-                    <td style="width: 42rem; text-align: left">
+                    <td style="width: 45rem; text-align: left">
                       <code>${web3.eth.accounts[0]}</code>
                     </td>
                   </tr>
