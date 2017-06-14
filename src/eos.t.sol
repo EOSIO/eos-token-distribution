@@ -119,6 +119,24 @@ contract EOSSaleTest is DSTest, DSExec {
         sale.buy.value(1 ether)();
     }
 
+    function testBuyWithLimit() {
+        sale.buyWithLimit.value(1 ether)(now, 2 ether);
+    }
+
+    function testFailBuyOverLimit() {
+        user1.doBuy(1 ether);
+        sale.buyWithLimit.value(1 ether)(now, 1.5 ether);
+    }
+
+    function testFailBuyTooLate() {
+        addTime();
+        sale.buyWithLimit.value(1 ether)(now, 0);
+    }
+
+    function testFailBuyTooEarly() {
+        sale.buyWithLimit.value(1 ether)(now + 1 days, 0);
+    }
+
     function testBuyFirstDay() {
         sale.buy.value(1 ether)();
         sale.addTime(1 days);
@@ -135,7 +153,7 @@ contract EOSSaleTest is DSTest, DSExec {
         sale.buy.value(1 ether)();
         sale.addTime(1 days);
         sale.claim(1, this);
-        // 25 tokens issued per day after first day
+        // 23 tokens issued per day after first day
         assertEq(EOS.balanceOf(this), 54.25 ether);
     }
 
