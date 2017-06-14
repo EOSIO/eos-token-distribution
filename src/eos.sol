@@ -14,7 +14,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     DSToken                     public EOS;  
     uint                        public startTime;
     uint                        public numberOfDays;
-    uint                        public foundersAllocation;
+    uint128                     public foundersAllocation;
     uint                        public createPerDay;
     uint                        public createFirstDay;
 
@@ -30,7 +30,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     event LogRegister(address who, bytes key);
 
     
-    function EOSSale(uint numberOfDays_, uint128 totalSupply_, uint startTime_, uint foundersAlloc_, bytes foundersKey ) {
+    function EOSSale(uint numberOfDays_, uint128 totalSupply_, uint startTime_, uint128 foundersAlloc_, bytes foundersKey ) {
         numberOfDays       = numberOfDays_;
         EOS                = new DSToken("EOS");
         EOS.mint(totalSupply_);
@@ -40,7 +40,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
         // TODO: transfer foundersAllocation of EOS ERC-20 tokens to founders address and map to founders public key
         // founders ETH address needs to be a provably non-transferrable address
         address founders; // NULL address is provably not transferrable 
-        EOS.push(founders, cast(foundersAllocation));
+        EOS.push(founders, foundersAllocation);
         keys[founders] = foundersKey;
         LogRegister(founders, foundersKey);
 

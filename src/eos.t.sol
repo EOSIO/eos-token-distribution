@@ -48,7 +48,7 @@ contract TestOwner {
 
 contract TestableEOSSale is EOSSale {
 
-    function TestableEOSSale( uint n, uint128 d, uint s, uint a, bytes k )
+    function TestableEOSSale( uint n, uint128 d, uint s, uint128 a, bytes k )
              EOSSale(n, d, s, a, k) {}
     
     uint public localTime;
