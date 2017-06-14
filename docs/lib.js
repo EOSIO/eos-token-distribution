@@ -1,5 +1,7 @@
 var byId       = id          => document.getElementById(id)
 var formatWad  = wad         => String(wad).replace(/\..*/, "")
+var formatEOS  = wad         => wad.toFixed(4)
+var formatETH  = wad         => wad.toFixed(2)
 var getValue   = id          => byId(id).value
 var show       = id          => byId(id).classList.remove("hidden")
 var hide       = id          => byId(id).classList.add("hidden")

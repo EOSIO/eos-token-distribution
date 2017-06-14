@@ -37,10 +37,26 @@ function showPane(name) {
 
 onload = () => setTimeout(() => {
   if (!window.web3) {
-    document.body.innerHTML = `
-      <h1>No web3 provider detected</h1>
-      <p>Consider installing <a href=https://metamask.io>MetaMask</a>.</p>
-    `
+    render("app", `
+      <div>
+        <div class=pane>
+          <h2>Could not connect to Ethereum</h2>
+          <p>
+
+            Consider installing <a href=https://metamask.io>MetaMask</a>,
+            <a href=#>Mist</a> or another Ethereum client.
+
+            If you&rsquo;re using MetaMask, you may need to unlock
+            your account. You can also try disabling and re-enabling
+            the MetaMask plugin by going to <a
+            href=chrome://extensions>chrome://extensions</a>.
+
+          </p>
+
+          <p>Please reload this page and try again. </p>
+        </div>
+      </div>
+    `)
   } else {
     eos_sale  = web3.eth.contract(eos_sale_abi).at(eos_sale_address_kovan)
     eos_token = web3.eth.contract(eos_token_abi).at(eos_token_address_kovan)
@@ -79,10 +95,10 @@ onload = () => setTimeout(() => {
                   day.begins = startMoment.clone().add(23 * (day.id - 1), "hours")
                   day.ends = day.begins.clone().add(23, "hours")
                 }
-  
+
                 eos_sale.claimed(day.id, web3.eth.accounts[0], hopefully(claimed => {
                   day.claimed = claimed
-  
+
                   $(null, day)
                 }))
               }))
@@ -92,23 +108,23 @@ onload = () => setTimeout(() => {
           var unclaimed = days.filter((x, i) => {
             return i < Number(today) && !x.claimed
           }).reduce((a, x) => x.received.plus(a), web3.toBigNumber(0))
-  
+
           render("app", `
             <p style="width: 80%">
-  
+
               The EOS Token Sale will distributed daily over about 341
               days.  1,000,000,000 (one billion) EOS tokens will be minted
               at the start of the sale.  These tokens will be split into
               different rolling windows of availability.  The tokens
               available in a window will be split proportional to all
               contributions made during the window period.
-  
+
             </p>
-  
+
             For more details, please review the token sale <a
             href=https://github.com/eosio/eos-token-sale>contract source
             code</a>.
-  
+
             ${web3.eth.accounts[0] ? `
               <div class=pane>
                 <table style="width: 100%">
@@ -126,7 +142,7 @@ onload = () => setTimeout(() => {
                     ${days.map((day, i) => i > Number(today) ? `
                       <tr class=future>
                         <td>#${day.name}</td>
-                        <td>${formatWad(day.createOnDay)} EOS</td>
+                        <td>${formatEOS(day.createOnDay)} EOS</td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -137,10 +153,10 @@ onload = () => setTimeout(() => {
                           #${day.name}
                           ${i == Number(today) ? "(open) " : ""}
                         </td>
-                        <td>${formatWad(day.createOnDay)} EOS</td>
-                        <td>${formatWad(day.dailyTotal)} ETH</td>
-                        <td>${formatWad(day.userBuys)} ETH</td>
-                        <td>${formatWad(day.received)} EOS</td>
+                        <td>${formatEOS(day.createOnDay)} EOS</td>
+                        <td>${formatETH(day.dailyTotal)} ETH</td>
+                        <td>${formatETH(day.userBuys)} ETH</td>
+                        <td>${formatEOS(day.received)} EOS</td>
                         <td>${day.dailyTotal == 0 ? "n/a" : (
                           `${day.price.toFixed(9)} ETH/EOS`
                         )}</td>
@@ -182,7 +198,7 @@ onload = () => setTimeout(() => {
                   <tr>
                     <th>Token balances</th>
                     <td style="text-align: left">
-                      ${eth_balance.div(WAD)} ETH
+                      ${formatETH(eth_balance.div(WAD))} ETH
                       <a href=# id=buy-link
                          style="margin-left: 1rem; float: right"
                          onclick="showPane('buy'),
@@ -195,7 +211,7 @@ onload = () => setTimeout(() => {
                     <tr>
                       <th></th>
                       <td style="text-align: left">
-                        ${unclaimed} EOS (unclaimed)
+                        ${formatEOS(unclaimed)} EOS (unclaimed)
                         <span style="margin-left: 1rem; float: right">
                           <a href=# id=claim-button
                              onclick="claim(), event.preventDefault()">
@@ -212,7 +228,7 @@ onload = () => setTimeout(() => {
                     <tr>
                       <th></th>
                       <td style="text-align: left">
-                        ${eos_balance.div(WAD)} EOS
+                        ${formatEOS(eos_balance.div(WAD))} EOS
                         <a href=# id=transfer-link
                            style="margin-left: 1rem; float: right"
                            onclick="showPane('transfer'),
@@ -260,13 +276,13 @@ onload = () => setTimeout(() => {
                   <tr>
                     <th>Tokens for sale</th>
                     <td style="text-align: left">
-                      ${formatWad(days[Number(today)].createOnDay)} EOS
+                      ${formatEOS(days[Number(today)].createOnDay)} EOS
                     </td>
                   </tr>
                   <tr>
                     <th>Total contributions</th>
                     <td style="text-align: left">
-                      ${formatWad(days[Number(today)].dailyTotal)} ETH
+                      ${formatETH(days[Number(today)].dailyTotal)} ETH
                     </td>
                   </tr>
                   <tr>
@@ -284,17 +300,17 @@ onload = () => setTimeout(() => {
                   <tr>
                     <th>Add contribution</th>
                     <td style="text-align: left">
-                        <input type=text required id=buy-input
-                               placeholder=${eth_balance.div(WAD)}>
-                        ETH
-                        <span style="margin-left: 1.5rem">
-                          <button id=buy-button>
-                            Buy EOS tokens
-                          </button>
-                          <span id=buy-progress class=hidden>
-                            Sending ETH...
-                          </span>
+                      <input type=text required id=buy-input
+                             placeholder=${formatETH(eth_balance.div(WAD))}>
+                      ETH
+                      <span style="margin-left: 1.5rem">
+                        <button id=buy-button>
+                          Buy EOS tokens
+                        </button>
+                        <span id=buy-progress class=hidden>
+                          Sending ETH...
                         </span>
+                      </span>
                     </td>
                   </tr>
                 </table>
@@ -314,7 +330,7 @@ onload = () => setTimeout(() => {
                   <tr>
                     <th>Transfer amount</th>
                     <td style="text-align: left">
-                      <input placeholder=${eos_balance.div(WAD)}
+                      <input placeholder=${formatEOS(eos_balance.div(WAD))}
                              id=transfer-amount-input required
                              style="width: 15em">
                       EOS
@@ -330,18 +346,18 @@ onload = () => setTimeout(() => {
                   </tr>
                 </table>
               </form>
-              
+
             ` : `
               <div class=pane>
                 <h3>Ethereum account not found</h3>
-  
+
                 It looks like an Ethereum client is available in your
                 browser, but I couldn&rsquo;t find any accounts.
                 If you&rsquo;re using MetaMask, you may need to unlock
                 your account. You can also try disabling and re-enabling
                 the MetaMask plugin by going to <a
                 href=chrome://extensions>chrome://extensions</a>.
-  
+
               </div>
             `}
           `)
@@ -363,7 +379,7 @@ function buy() {
 function claim() {
   byId("claim-button").classList.add("hidden")
   byId("claim-progress").classList.remove("hidden")
-  eos_sale.claim(web3.eth.accounts[0], hopefully(result => {
+  eos_sale.claimAll(web3.eth.accounts[0], hopefully(result => {
     setTimeout(() => location.reload(), 10000)
   }))
 }
@@ -382,7 +398,7 @@ function register() {
   byId("register-button").classList.add("hidden")
   byId("register-progress").classList.remove("hidden")
   var key = getValue("register-input")
-  eos_sale.register(key, hopefully(result => {
+  eos_sale.register(web3.fromAscii(key), hopefully(result => {
     setTimeout(() => location.reload(), 10000)
   }))
 }
