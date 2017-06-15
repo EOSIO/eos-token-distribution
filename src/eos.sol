@@ -17,6 +17,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     uint128                     public foundersAllocation;
     uint                        public createPerDay;
     uint                        public createFirstDay;
+    uint                        public openTime;
 
     mapping(uint=>uint)         public dailyTotals;
     mapping(uint=>
@@ -30,7 +31,18 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     event LogRegister(address who, bytes key);
 
     
-    function EOSSale(uint numberOfDays_, uint128 totalSupply_, uint startTime_, uint128 foundersAlloc_, bytes foundersKey ) {
+    /// @param openTime_      - the first time at which payments will be accepted
+    /// @param startTime      - the end of initial window and start of the first 23 hour window
+    /// @param numberOfDays_  - the total number of 23 hour periods after the initial window
+    /// @param totalSupply_   - the total number of tokens to be allocated by this contract
+    /// @param foundersAlloc_ - the number of tokens reserved for founders and not distributed by sale
+    /// @param foundersKey    - the EOS key that will control the founders allocation in genesis block
+    function EOSSale(uint numberOfDays_, uint128 totalSupply_, uint openTime_, uint startTime_, uint128 foundersAlloc_, bytes foundersKey ) {
+        assert( totalSupply_ > foundersAlloc_ );
+        assert( openTime_ < startTime_ );
+        assert( numberOfDays > 0 );
+
+        openTime           = openTime_;
         numberOfDays       = numberOfDays_;
         EOS                = new DSToken("EOS");
         EOS.mint(totalSupply_);
@@ -76,18 +88,21 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
         return createPerDay;
     }
 
-    // the default action is to buy tokens when receiving funds
-    function() payable {
-        buy();
-    }
+    // the default action upon receiving funds is disabled to mitigate people from sending
+    // from accounts they do not control
+    // function() payable {
+    //    buy();
+    // }
 
     // this method provides the buyer some protections regarding which day the buy 
     // order is submitted and the maximum price prior to applying this payment that will
     // be allowed.
     function buyWithLimit( uint timestamp, uint limit ) note payable {
+        assert( openTime < time()  );
         assert( 0.01 ether <= msg.value && msg.value <= 1000 ether ); // min / max 
-        assert( today() <= numberOfDays );
-        assert( dayFor(timestamp) == today() );
+        assert( today() <= numberOfDays ); /// prevent funds after last day
+        assert( dayFor(timestamp) >= today() ); /// allow people to pre-fund future days
+        assert( dayFor(timestamp) <= numberOfDays ); /// prevent people from prefunding past the end
 
         if( limit != 0 ) assert( dailyTotals[today()] + msg.value < limit );
 
@@ -106,6 +121,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
         }
     }
 
+    /// buys at the current time with no limit
     function buy() note payable {
        buyWithLimit( time(), 0 );
     }
