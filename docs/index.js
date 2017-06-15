@@ -284,7 +284,6 @@ onload = () => setTimeout(() => {
                   <tr>
                     <th>Add contribution</th>
                     <td style="text-align: left">
-                      <form>
                         <input type=text required id=buy-input
                                placeholder=${eth_balance.div(WAD)}>
                         ETH
@@ -296,11 +295,10 @@ onload = () => setTimeout(() => {
                             Sending ETH...
                           </span>
                         </span>
-                      </form>
                     </td>
                   </tr>
                 </table>
-              </div>
+              </form>
               <form class="hidden pane" id=transfer-pane
                     onsubmit="transfer(), event.preventDefault()">
                 <h3>Transfer EOS tokens to another Ethereum account</h3>
@@ -332,6 +330,7 @@ onload = () => setTimeout(() => {
                   </tr>
                 </table>
               </form>
+              
             ` : `
               <div class=pane>
                 <h3>Ethereum account not found</h3>
@@ -373,7 +372,7 @@ function transfer() {
   byId("transfer-button").classList.add("hidden")
   byId("transfer-progress").classList.remove("hidden")
   var guy = getValue("transfer-address-input")
-  var wad = getValue("transfer-amount-input")
+  var wad = getValue("transfer-amount-input") * WAD
   eos_token.transfer(guy, wad, hopefully(result => {
     setTimeout(() => location.reload(), 10000)
   }))
