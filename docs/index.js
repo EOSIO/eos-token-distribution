@@ -345,6 +345,7 @@ function refresh() {
                       <th>EOS for sale</th>
                       <th>Total ETH</th>
                       <th>Effective price</th>
+                      <th>Closes</th>
                       <th>Your ETH</th>
                       <th>Your EOS</th>
                     </tr>
@@ -361,6 +362,7 @@ function refresh() {
                         <td>{day.dailyTotal == 0 ? "n/a" : (
                           `${day.price.toFixed(9)} ETH/EOS`
                         )}</td>
+                        <td>{day.ends.fromNow()}</td>
                         <td>{formatETH(day.userBuys)} ETH</td>
                         <td>
                           {formatEOS(day.received)} EOS
