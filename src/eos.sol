@@ -143,7 +143,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
         LogClaim(day, who, reward);
     }
 
-    function claim(address who) note {
+    function claimAll(address who) note {
         for (uint i = 0; i < today(); i++) {
             claim(i, who);
         }

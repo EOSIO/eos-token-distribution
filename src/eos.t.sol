@@ -324,7 +324,7 @@ contract EOSSaleTest is DSTest, DSExec {
 
         assertEq(EOS.balanceOf(this), 0);
 
-        sale.claim(this);
+        sale.claimAll(this);
         assertEq(EOS.balanceOf(this), 77.25 ether);
     }
 
@@ -339,7 +339,7 @@ contract EOSSaleTest is DSTest, DSExec {
 
         assertEq(EOS.balanceOf(this), 0);
 
-        sale.claim(this);
+        sale.claimAll(this);
         assertEq(EOS.balanceOf(this), 77.25 ether);
     }
 

@@ -14,12 +14,12 @@ var hopefully = $ => (error, result) => {
 
 function lament(error) {
   if (error) {
-    append("app", `
+    document.querySelector("#before-error").outerHTML += `
       <div class="error pane">
         <h3>${error.message}</h3>
         <pre>${error.stack}</pre>
       </div>
-    `)
+    `
   }
 }
 
@@ -39,7 +39,7 @@ onload = () => setTimeout(() => {
   if (!window.web3) {
     render("app", `
       <div>
-        <div class=pane>
+        <div class=pane id=before-error>
           <h2>Could not connect to Ethereum</h2>
           <p>
 
@@ -131,7 +131,7 @@ onload = () => setTimeout(() => {
             code</a>.
 
             ${web3.eth.accounts[0] ? `
-              <div class=pane>
+              <div class=pane id=before-error>
                 <table>
                   <tr>
                     <th>Ethereum account</th>
@@ -179,10 +179,10 @@ onload = () => setTimeout(() => {
                       <td style="text-align: left">
                         ${formatEOS(unclaimed)} EOS (unclaimed)
                         <span style="margin-left: 1rem; float: right">
-                          <a href=# id=claim-button
-                             onclick="claim(), event.preventDefault()">
+                          <button id=claim-button
+                                  onclick="claim(), event.preventDefault()">
                             Claim EOS tokens
-                          </a>
+                          </button>
                           <span id=claim-progress class=hidden>
                             Claiming tokens...
                           </span>
@@ -353,7 +353,7 @@ onload = () => setTimeout(() => {
                 </table>
               </div>
             ` : `
-              <div class=pane>
+              <div class=pane id=before-error>
                 <h3>Ethereum account not found</h3>
 
                 It looks like an Ethereum client is available in your
@@ -384,7 +384,9 @@ function buy() {
 function claim() {
   byId("claim-button").classList.add("hidden")
   byId("claim-progress").classList.remove("hidden")
-  eos_sale.claim(web3.eth.accounts[0], hopefully(result => {
+  eos_sale.claimAll(web3.eth.accounts[0], {
+    gas: 2000000,
+  }, hopefully(result => {
     setTimeout(() => location.reload(), 20000)
   }))
 }
