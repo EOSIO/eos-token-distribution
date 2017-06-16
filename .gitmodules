@@ -10,9 +10,6 @@
 [submodule "lib/ds-note"]
 	path = lib/ds-note
 	url = https://github.com/dapphub/ds-note
-[submodule "lib/ds-multisig"]
-	path = lib/ds-multisig
-	url = https://github.com/dapphub/ds-multisig
 [submodule "lib/ds-token"]
 	path = lib/ds-token
 	url = https://github.com/dapphub/ds-token
