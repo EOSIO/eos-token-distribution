@@ -140,7 +140,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     // truncated to 8 or less decimal places anyway when it is launched on own chain.
     function claim(uint day, address who) note {
         assert( today() > day );
-        assert( !claimed[day][who] );
+        if (claimed[day][who]) return;
         var dailyTotal = cast(dailyTotals[day]); // eth-style fixed-point 
         var userTotal = cast(userBuys[day][who]);
 
