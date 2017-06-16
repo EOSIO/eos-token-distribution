@@ -50,13 +50,13 @@ contract TestableEOSSale is EOSSale {
 
     function TestableEOSSale( uint n, uint128 t, uint o, uint s, uint128 a, bytes k )
              EOSSale(n, t, o, s, a, k) {}
-    
+
     uint public localTime;
 
     function time() constant internal returns (uint) {
         return localTime;
     }
-    
+
     function addTime(uint extra) {
         localTime += extra;
     }
@@ -64,7 +64,7 @@ contract TestableEOSSale is EOSSale {
 }
 
 contract EOSSaleTest is DSTest, DSExec {
-    
+
     TestableEOSSale sale;
     DSToken EOS;
 
@@ -78,10 +78,13 @@ contract EOSSaleTest is DSTest, DSExec {
 
     function setUp() {
         bytes memory x = new bytes(1);
-        sale = new TestableEOSSale(5, 156.25 ether, now, block.timestamp + 1 days, 10 ether, x);
-        sale.addTime(now + 1);
 
-        EOS = sale.EOS();
+        EOS = new DSToken("EOS");
+        sale = new TestableEOSSale(5, 156.25 ether, now, block.timestamp + 1 days, 10 ether, x);
+        EOS.setOwner(sale);
+        sale.initialize(EOS);
+
+        sale.addTime(now + 1);
 
         user1 = new TestUser(sale);
         user2 = new TestUser(sale);
@@ -101,13 +104,13 @@ contract EOSSaleTest is DSTest, DSExec {
     }
 
     function nextRound(uint wad, uint wad1, uint wad2) {
-        
+
         if (wad != 0) sale.buy.value(wad)();
         if (wad1 != 0) user1.doBuy(wad1);
         if (wad2 != 0) user2.doBuy(wad2);
 
         addTime();
-        
+
         sale.claim(window, this);
         sale.claim(window, user1);
         sale.claim(window, user2);
@@ -152,7 +155,7 @@ contract EOSSaleTest is DSTest, DSExec {
         sale.addTime(1 days);
         sale.claim(0, this);
         assertEq(EOS.balanceOf(this), 31.25 ether);
-        
+
         sale.buy.value(1 ether)();
         sale.addTime(1 days);
         sale.claim(1, this);
@@ -275,7 +278,7 @@ contract EOSSaleTest is DSTest, DSExec {
 
         owner.doCollect();
         assertEq(owner.balance, 12 ether);
-    
+
         user1.doFreeze();
     }
 
