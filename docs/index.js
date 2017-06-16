@@ -1,5 +1,5 @@
-var eos_sale_address_kovan  = "0x80dd33ac64789251432511161f1869657e6b1173"
-var eos_token_address_kovan = "0x2b011999cc166f56c467e07898e718519090cc4f"
+var eos_sale_address_kovan  = "0x433364dc49c171468b3a2c2df9bfc47ef362458f"
+var eos_token_address_kovan = "0x5c476e23b303f1973bab81b9dea61a22aaceef68"
 var eos_sale, eos_token
 
 var state

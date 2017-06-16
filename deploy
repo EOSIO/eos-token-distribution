@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
+export DAPP_NO_SAVE=1
 export ETH_GAS=4000000
 
 eos=$(set -x; dapp create DSToken \
@@ -9,8 +10,8 @@ eos=$(set -x; dapp create DSToken \
 
 sale=$(set -x; dapp create EOSSale 7 \
   $(seth --to-uint256 $(seth --to-wei 1000000000 eth)) \
-  $(date +%s -d '10 minutes') \
-  $(date +%s -d '3 days') \
+  $(date +%s -d '3 seconds') \
+  $(date +%s -d '3 hours') \
   $(seth --to-uint256 $(seth --to-wei 100000000 eth)) \
   $(seth --from-ascii abcdefghijklmnopqrstuvwxyzABCDEFG)
 )
