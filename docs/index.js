@@ -281,7 +281,7 @@ function render({
                     <th>Sale window</th>
                     <td style={{ textAlign: "left" }}>
                       <select id="sale-window" value={buyWindow} onChange={e => update({ buyWindow: e.target.value })}>
-                        {days.map((d, i) => <option value={i} selected={i == buyWindow}>Window #{i}</option>)}
+                        {days.map((d, i) => <option key={i} value={i}>Window #{i}</option>)}
                       </select>
                     </td>
                   </tr>
@@ -422,9 +422,11 @@ function buy() {
   byId("buy-button").classList.add("hidden")
   byId("buy-progress").classList.remove("hidden")
   var wad = getValue("buy-input")
-  eos_sale.buyWithLimit(Math.round(
-    state.days[state.buyWindow].ends.unix() / 1000
-  ) - 10000, 0, { value: web3.toWei(wad) }, hopefully(result =>
+  var timestamp = Math.round(state.days[state.buyWindow].ends.unix()) - 3600
+  console.log(timestamp)
+  eos_sale.buyWithLimit(timestamp, 0, {
+    value: web3.toWei(wad)
+  }, hopefully(result =>
     ping(result).then(() => {
       hidePanes()
       byId("buy-input").value = ""
