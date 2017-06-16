@@ -79,10 +79,10 @@ onload = () => setTimeout(() => {
                   day.begins = startMoment.clone().add(23 * (day.id - 1), "hours")
                   day.ends = day.begins.clone().add(23, "hours")
                 }
-  
+
                 eos_sale.claimed(day.id, web3.eth.accounts[0], hopefully(claimed => {
                   day.claimed = claimed
-  
+
                   $(null, day)
                 }))
               }))
@@ -92,23 +92,27 @@ onload = () => setTimeout(() => {
           var unclaimed = days.filter((x, i) => {
             return i < Number(today) && !x.claimed
           }).reduce((a, x) => x.received.plus(a), web3.toBigNumber(0))
-  
+
+          if(publicKey === '0x') {
+            publicKey = null
+          }
+
           render("app", `
             <p style="width: 80%">
-  
+
               The EOS Token Sale will distributed daily over about 341
               days.  1,000,000,000 (one billion) EOS tokens will be minted
               at the start of the sale.  These tokens will be split into
               different rolling windows of availability.  The tokens
               available in a window will be split proportional to all
               contributions made during the window period.
-  
+
             </p>
-  
+
             For more details, please review the token sale <a
             href=https://github.com/eosio/eos-token-sale>contract source
             code</a>.
-  
+
             ${web3.eth.accounts[0] ? `
               <div class=pane>
                 <table style="width: 100%">
@@ -162,8 +166,8 @@ onload = () => setTimeout(() => {
                     <td style="text-align: left">
                       ${publicKey ? `
                         <code>${publicKey}</code>
-                        <a href=# id=register-link style="float: right"
-                           onclick="showPane('register'),
+                        <a href=# id=generate-link style="float: right"
+                           onclick="showPane('generate'),
                                     event.preventDefault()">
                           Change your EOS key
                         </a>
@@ -171,9 +175,8 @@ onload = () => setTimeout(() => {
                         <span style="color: gray">
                           (no EOS public key registered)
                         </span>
-                        <a href=# id=register-link style="float: right"
-                           onclick="showPane('register'),
-                                    event.preventDefault()">
+                        <a href=# id=generate-link style="float: right"
+                           onclick="generate(), event.preventDefault()">
                           Register your EOS key
                         </a>
                       `}
@@ -224,16 +227,54 @@ onload = () => setTimeout(() => {
                   `}
                 </table>
               </div>
+              <form class="hidden pane" id=generate-pane
+                  onsubmit="event.preventDefault(), generateConfirm()">
+                <span id=generate-progress>
+                  Generating key...
+                </span>
+                <div id=generate-confirm class=hidden>
+                  <h3>Generate EOS key</h3>
+                  You must save this "Private key" in a safe location before registering.  Copy
+                  and paste this key into your backup file and if it is a USB, safly eject.  You
+                  should make more than one copy.  Finally, paste the private key into the field
+                  below when you are done and click "Continue" ..
+
+                  <p>This section is work-in-proress and may change..</p>
+
+                  <table>
+                    <tr>
+                      <th>Private key</th>
+                      <td style="text-align: left">
+                        <span id=generate-privkey style="width: 30em">&nbsp;</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Confirm Private Key</th>
+                      <td>
+                        <input name=wif type=password
+                          id=generate-confirm-input style="width: 30em"
+                          autocomplete=off/>
+                        <p id=generate-unmatched class=hidden>
+                          <span style="color: red">
+                            Please check the confirmed key again, it does not match.
+                          </span>
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                  <button id=generate-button>
+                    Continue
+                  </button>
+                </div>
+              </form>
               <form class="hidden pane" id=register-pane
-                    onsubmit="register(), event.preventDefault()">
-                <h3>${publicKey ? "Change" : "Register"} EOS public key</h3>
+                  onsubmit="register(), event.preventDefault()">
+                <h3>Register EOS key</h3>
                 <table>
                   <tr>
                     <th>Public key</th>
                     <td style="text-align: left">
-                      <input value=${escape(publicKey)}
-                             id=register-input required
-                             style="width: 30em">
+                      <span id=generate-pubkey style="width: 30em">&nbsp;</span>
                       <span style="margin-left: 1rem">
                         <button id=register-button>
                           ${publicKey ? "Change" : "Register"} key
@@ -244,6 +285,12 @@ onload = () => setTimeout(() => {
                       </span>
                     </td>
                   </tr>
+                </table>
+              </form>
+              <form class="hidden pane" id=register-pane
+                    onsubmit="register(), event.preventDefault()">
+                <h3>${publicKey ? "Change" : "Register"} EOS public key</h3>
+                <table>
                 </table>
               </form>
               <form class="hidden pane" id=buy-pane
@@ -335,17 +382,20 @@ onload = () => setTimeout(() => {
             ` : `
               <div class=pane>
                 <h3>Ethereum account not found</h3>
-  
+
                 It looks like an Ethereum client is available in your
                 browser, but I couldn&rsquo;t find any accounts.
                 If you&rsquo;re using MetaMask, you may need to unlock
                 your account. You can also try disabling and re-enabling
                 the MetaMask plugin by going to <a
                 href=chrome://extensions>chrome://extensions</a>.
-  
+
               </div>
             `}
           `)
+          if(!publicKey) {
+            byId("app").addEventListener("mousemove", entropyEvent, {capture: false, passive: true})
+          }
         }))
       }))
     }))
@@ -379,10 +429,49 @@ function transfer() {
   }))
 }
 
+function entropyEvent(e) {
+  var {key_utils} = eos_ecc
+  if(e.type === 'mousemove')
+      key_utils.addEntropy(e.pageX, e.pageY, e.screenX, e.screenY)
+  else
+      console.log('onEntropyEvent Unknown', e.type, e)
+}
+
+function generate() {
+  showPane('generate')
+  setTimeout(() => {
+    privateKeyPair = genKeyPair()
+    hide("generate-progress")
+    render("generate-pubkey", privateKeyPair.pubkey)
+    render("generate-privkey", privateKeyPair.privkey)
+    show("generate-confirm")
+  })
+}
+
+let privateKeyPair = null
+
+function genKeyPair() {
+  var {PrivateKey} = eos_ecc
+  var d = PrivateKey.randomKey()
+  var privkey = d.toWif()
+  var pubkey = d.toPublic().toString()
+  return {pubkey, privkey}
+}
+
+function generateConfirm() {
+  const confirmPriv = getValue("generate-confirm-input")
+  if(confirmPriv !== privateKeyPair.privkey) {
+    show("generate-unmatched")
+    return
+  }
+  hide('generate-pane')
+  show('register-pane')
+}
+
 function register() {
+  const key = privateKeyPair.pubkey
   byId("register-button").classList.add("hidden")
   byId("register-progress").classList.remove("hidden")
-  var key = getValue("register-input")
   eos_sale.register(key, hopefully(result => {
     setTimeout(() => location.reload(), 10000)
   }))
