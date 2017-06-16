@@ -92,7 +92,7 @@ onload = () => setTimeout(() => {
                 day.dailyTotal = dailyTotal.div(WAD)
                 day.userBuys = userBuys.div(WAD)
                 day.price = dailyTotal.div(createOnDay)
-                day.received = day.createOnDay.div(day.dailyTotal).times(day.userBuys)
+                day.received = day.dailyTotal.equals(0) ? web3.toBigNumber(0) : day.createOnDay.div(day.dailyTotal).times(day.userBuys)
 
                 if (day.id == 0) {
                   day.ends = startMoment
@@ -302,7 +302,7 @@ onload = () => setTimeout(() => {
                              style="width: 15em">
                       EOS
                       <span style="margin-left: 1rem">
-                        <button id=transfer-button >
+                        <button id=transfer-button>
                           Transfer EOS tokens
                         </button>
                         <span id=transfer-progress class=hidden>
@@ -326,19 +326,11 @@ onload = () => setTimeout(() => {
                     </tr>
                   </thead>
                   <tbody>
-                    ${days.map((day, i) => i > Number(today) ? `
-                      <tr class=future>
-                        <td>#${day.name}</td>
-                        <td>${formatEOS(day.createOnDay)} EOS</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                      </tr>
-                    ` : `
+                    ${days.map((day, i) => `
                       <tr ${i == Number(today) ? "class=active" : ""}>
                         <td>
                           #${day.name}
-                          ${i == Number(today) ? "(open) " : ""}
+                          ${i == Number(today) ? "" : ""}
                         </td>
                         <td>${formatEOS(day.createOnDay)} EOS</td>
                         <td>${formatETH(day.dailyTotal)} ETH</td>
