@@ -48,7 +48,7 @@ contract TestOwner {
 
 contract TestableEOSSale is EOSSale {
 
-    function TestableEOSSale( uint n, uint128 t, uint o, uint s, uint128 a, bytes k )
+    function TestableEOSSale( uint n, uint128 t, uint o, uint s, uint128 a, string k )
              EOSSale(n, t, o, s, a, k) {}
 
     uint public localTime;
@@ -77,7 +77,7 @@ contract EOSSaleTest is DSTest, DSExec {
     uint window = 0;
 
     function setUp() {
-        bytes memory x = new bytes(1);
+        string memory x = new string(1);
 
         EOS = new DSToken("EOS");
         sale = new TestableEOSSale(5, 156.25 ether, now, block.timestamp + 1 days, 10 ether, x);
@@ -119,7 +119,7 @@ contract EOSSaleTest is DSTest, DSExec {
     }
 
     function testFailBuyBeforeOpen() {
-        bytes memory x = new bytes(1);
+        string memory x = new string(1);
         sale = new TestableEOSSale(5, 156.25 ether, now + 1, block.timestamp + 1 days, 10 ether, x);
         sale.addTime(now);
         sale.buy.value(1 ether)();
@@ -347,18 +347,15 @@ contract EOSSaleTest is DSTest, DSExec {
     }
 
     function testRegister() {
-        bytes memory x = new bytes(33);
-        bytes memory y = new bytes(33);
-        x[0] = byte(1);
-        y[0] = byte(2);
+        string memory x = new string(56);
+        string memory y = new string(56);
 
         sale.register(x);
         sale.register(y);
     }
 
     function testFailRegister() {
-        bytes memory x = new bytes(1);
-        x[0] = byte(1);
+        string memory x = new string(100);
         sale.register(x);
     }
 }

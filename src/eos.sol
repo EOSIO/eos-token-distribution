@@ -15,7 +15,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     uint                        public startTime;
     uint                        public numberOfDays;
     uint128                     public foundersAllocation;
-    bytes                       public foundersKey;
+    string                      public foundersKey;
     uint                        public createPerDay;
     uint                        public createFirstDay;
     uint                        public openTime;
@@ -31,7 +31,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     event LogBuy(uint day, address who, uint wad);
     event LogClaim(uint day, address who, uint wad);
     event LogCollect(uint wad);
-    event LogRegister(address who, bytes key);
+    event LogRegister(address who, string key);
 
     
     // @param openTime_      - the first time at which payments will be accepted
@@ -40,7 +40,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     // @param totalSupply_   - the total number of tokens to be allocated by this contract
     // @param foundersAlloc_ - the number of tokens reserved for founders and not distributed by sale
     // @param foundersKey    - the EOS key that will control the founders allocation in genesis block
-    function EOSSale(uint numberOfDays_, uint128 totalSupply_, uint openTime_, uint startTime_, uint128 foundersAlloc_, bytes foundersKey_) {
+    function EOSSale(uint numberOfDays_, uint128 totalSupply_, uint openTime_, uint startTime_, uint128 foundersAlloc_, string foundersKey_) {
         assert( totalSupply_ > foundersAlloc_ );
         assert( openTime_ < startTime_ );
         assert( numberOfDays_ > 0 );
@@ -151,10 +151,10 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     // The value can be a public key. Read full key import
     // policy. Manually registering requires a 33 byte public key
     // base58 encoded using the STEEM, BTS, or EOS public key format
-    mapping(address=>bytes)   public keys;
-    function register(bytes key) note {
+    mapping(address=>string)   public keys;
+    function register(string key) note {
         assert( today() <=  numberOfDays + 1 );
-        assert(key.length == 33);
+        assert(bytes(key).length <= 64);
         keys[msg.sender] = key;
         LogRegister(msg.sender, key);
     }
