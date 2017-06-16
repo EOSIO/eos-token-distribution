@@ -77,10 +77,9 @@ onload = () => setTimeout(() => {
     eos_sale  = web3.eth.contract(eos_sale_abi).at(eos_sale_address_kovan)
     eos_token = web3.eth.contract(eos_token_abi).at(eos_token_address_kovan)
 
-<<<<<<< HEAD
     web3.eth.getBlock(0, hopefully(block => {
       if (block.hash == chain.genesis) {
-        refresh()
+        poll()
       } else {
         lament(new Error(`Wrong blockchain; please use ${chain.name}`))
       }
@@ -90,15 +89,6 @@ onload = () => setTimeout(() => {
 
 function refresh() {
   return new Promise((resolve, reject) => {
-||||||| merged common ancestors
-=======
-    poll()
-  }
-}, 500)
-
-function refresh() {
-  return new Promise((resolve, reject) => {
->>>>>>> a433b178fda71343c704d71115aaca4f997f358c
     web3.eth.getBlock("latest", hopefully(block => {
       var time = block.timestamp
 
@@ -300,7 +290,7 @@ function refresh() {
                   <tr>
                     <th>Effective price</th>
                     <td style={{ textAlign: "left" }}>
-                      {days[Number(today)].price.toFixed(9)} ETH/EOS
+                      {days[Number(today)].price.toFormat(9)} ETH/EOS
                     </td>
                   </tr>
                   <tr>
@@ -375,7 +365,7 @@ function refresh() {
                         <td>{formatEOS(day.createOnDay)} EOS</td>
                         <td>{formatETH(day.dailyTotal)} ETH</td>
                         <td>{day.dailyTotal == 0 ? "n/a" : (
-                          `${day.price.toFixed(9)} ETH/EOS`
+                          `${day.price.toFormat(9)} ETH/EOS`
                         )}</td>
                         <td>{day.ends.fromNow()}</td>
                         <td>{formatETH(day.userBuys)} ETH</td>
