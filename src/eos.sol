@@ -90,9 +90,9 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
 
     // the default action upon receiving funds is disabled to mitigate people from sending
     // from accounts they do not control
-    // function() payable {
-    //    buy();
-    // }
+    function() payable {
+       buy();
+    }
 
     // this method provides the buyer some protections regarding which day the buy 
     // order is submitted and the maximum price prior to applying this payment that will
