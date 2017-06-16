@@ -70,7 +70,7 @@ onload = () => setTimeout(() => {
     eos_sale  = web3.eth.contract(eos_sale_abi).at(eos_sale_address_kovan)
     eos_token = web3.eth.contract(eos_token_abi).at(eos_token_address_kovan)
 
-    refresh()
+    poll()
   }
 }, 500)
 
@@ -144,6 +144,11 @@ function refresh() {
             For more details, please review the token sale <a
             href="https://github.com/eosio/eos-token-sale">contract source
             code</a>.
+
+            <span style={{ position: "absolute", top: 0, right: 0, padding: "1rem 2rem" }}>
+              Refreshed at{" "}
+              <b>{moment(time * 1000).format("LTS")}</b>
+            </span>
 
             {web3.eth.accounts[0] ? <div>
               <div className="pane">
@@ -435,4 +440,8 @@ function ping(tx) {
     }
     f()
   })
+}
+
+function poll() {
+  refresh().then(() => setTimeout(poll, 3000))
 }
