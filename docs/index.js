@@ -14,7 +14,7 @@ var hopefully = $ => (error, result) => {
 
 function lament(error) {
   if (error) {
-    document.querySelector("#before-error").outerHTML += `
+    document.querySelector(".before-error").outerHTML += `
       <div class="error pane">
         <h3>${error.message}</h3>
         <pre>${error.stack}</pre>
@@ -39,7 +39,7 @@ onload = () => setTimeout(() => {
   if (!window.web3) {
     render("app", `
       <div>
-        <div class=pane id=before-error>
+        <div class="pane before-error">
           <h2>Could not connect to Ethereum</h2>
           <p>
 
@@ -131,7 +131,7 @@ onload = () => setTimeout(() => {
             code</a>.
 
             ${web3.eth.accounts[0] ? `
-              <div class=pane id=before-error>
+              <div class=pane>
                 <table>
                   <tr>
                     <th>Ethereum account</th>
@@ -282,7 +282,7 @@ onload = () => setTimeout(() => {
                   </tr>
                 </table>
               </form>
-              <form class="hidden pane" id=transfer-pane
+              <form class="hidden pane before-error" id=transfer-pane
                     onsubmit="transfer(), event.preventDefault()">
                 <h3>Transfer EOS tokens to another Ethereum account</h3>
                 <table>
@@ -353,7 +353,7 @@ onload = () => setTimeout(() => {
                 </table>
               </div>
             ` : `
-              <div class=pane id=before-error>
+              <div class="pane before-error">
                 <h3>Ethereum account not found</h3>
 
                 It looks like an Ethereum client is available in your
