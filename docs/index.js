@@ -362,7 +362,11 @@ function refresh() {
                           `${day.price.toFixed(9)} ETH/EOS`
                         )}</td>
                         <td>{formatETH(day.userBuys)} ETH</td>
-                        <td>{formatEOS(day.received)} EOS</td>
+                        <td>
+                          {formatEOS(day.received)} EOS
+                          {i >= Number(today)
+                            && <span title="Pending EOS subject to change if additional funds received" style={{ cursor: "pointer" }}> *</span>}
+                        </td>
                       </tr>
                     )}
                   </tbody>
