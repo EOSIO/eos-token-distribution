@@ -1,5 +1,5 @@
-var eos_sale_address_kovan  = "0x584483282cfcad032eb5ff6c03260a079ab5fbc8"
-var eos_token_address_kovan = "0x3b06e4e45ccc45ee21e276462ab07e8581fcf0e6"
+var eos_sale_address_kovan  = "0xa17a1237c90c72c93908a8d0a01d32f8bf787251"
+var eos_token_address_kovan = "0x44b6813e8943caaebefd2677d3c8f330d756adcc"
 var eos_sale, eos_token
 
 var WAD = 1000000000000000000
