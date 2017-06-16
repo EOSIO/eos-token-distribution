@@ -481,8 +481,12 @@ function ping(tx) {
   })
 }
 
+var loaded
+
+setTimeout(() => loaded || location.reload(), 20000)
+
 function poll() {
-  refresh().then(() => setTimeout(poll, 3000))
+  refresh().then(() => (loaded = true, setTimeout(poll, 3000)))
 }
 
 function update(x) {
