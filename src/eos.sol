@@ -118,17 +118,6 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
         dailyTotals[today()] += msg.value;
 
         LogBuy(today(), msg.sender, msg.value);
-
-        // save msg.sender if buyer hasn't registered already, this loop
-        // converts fixed sized sender into dynamic sized bytes
-        if (msg.sender == tx.origin && keys[msg.sender].length == 0) {
-            bytes memory key = new bytes(20);
-            for (uint i = 0; i < 20; i++) {
-                key[i] = byte(uint8(uint(msg.sender) / (2**(8*(19 - i)))));
-            }
-            keys[msg.sender] = key;
-            LogRegister(msg.sender, key);
-        }
     }
 
     // buys at the current time with no limit
