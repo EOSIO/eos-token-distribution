@@ -19,3 +19,6 @@
 [submodule "lib/ds-guard"]
 	path = lib/ds-guard
 	url = https://github.com/dapphub/ds-guard
+[submodule "lib/gnosis-multisig"]
+	path = lib/gnosis-multisig
+	url = https://github.com/dapphub/gnosis-multisig
