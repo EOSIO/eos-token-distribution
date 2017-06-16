@@ -77,6 +77,11 @@ onload = () => setTimeout(() => {
         eth_balance, eos_balance, publicKey,
       }) => {
         var startMoment = moment(Number(startTime) * 1000)
+
+        if (publicKey.length > 42) {
+          publicKey = web3.toAscii(publicKey)
+        }
+
         async.map(iota(Number(days) + 1), (i, $) => {
           var day = { id: i }
           eos_sale.createOnDay(day.id, hopefully(createOnDay => {
@@ -126,45 +131,6 @@ onload = () => setTimeout(() => {
             code</a>.
 
             ${web3.eth.accounts[0] ? `
-              <div class=pane>
-                <table style="width: 100%">
-                  <thead>
-                    <tr>
-                      <th>Sale window</th>
-                      <th>EOS for sale</th>
-                      <th>Total contributions</th>
-                      <th>Your contribution</th>
-                      <th>EOS received</th>
-                      <th>Effective price</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${days.map((day, i) => i > Number(today) ? `
-                      <tr class=future>
-                        <td>#${day.name}</td>
-                        <td>${formatEOS(day.createOnDay)} EOS</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                      </tr>
-                    ` : `
-                      <tr ${i == Number(today) ? "class=active" : ""}>
-                        <td>
-                          #${day.name}
-                          ${i == Number(today) ? "(open) " : ""}
-                        </td>
-                        <td>${formatEOS(day.createOnDay)} EOS</td>
-                        <td>${formatETH(day.dailyTotal)} ETH</td>
-                        <td>${formatETH(day.userBuys)} ETH</td>
-                        <td>${formatEOS(day.received)} EOS</td>
-                        <td>${day.dailyTotal == 0 ? "n/a" : (
-                          `${day.price.toFixed(9)} ETH/EOS`
-                        )}</td>
-                      </tr>
-                    `).join("\n")}
-                  </tbody>
-                </table>
-              </div>
               <div class=pane>
                 <table>
                   <tr>
@@ -249,7 +215,8 @@ onload = () => setTimeout(() => {
                     <td style="text-align: left">
                       <input value=${escape(publicKey)}
                              id=register-input required
-                             style="width: 30em">
+                             minlength=33 maxlength=33
+                             style="width: 30em; font-family: monospace">
                       <span style="margin-left: 1rem">
                         <button id=register-button>
                           ${publicKey ? "Change" : "Register"} key
@@ -274,19 +241,19 @@ onload = () => setTimeout(() => {
                     </td>
                   </tr>
                   <tr>
-                    <th>Tokens for sale</th>
+                    <th>EOS for sale</th>
                     <td style="text-align: left">
                       ${formatEOS(days[Number(today)].createOnDay)} EOS
                     </td>
                   </tr>
                   <tr>
-                    <th>Total contributions</th>
+                    <th>Total ETH</th>
                     <td style="text-align: left">
                       ${formatETH(days[Number(today)].dailyTotal)} ETH
                     </td>
                   </tr>
                   <tr>
-                    <th>Your contribution</th>
+                    <th>Your ETH</th>
                     <td style="text-align: left">
                       ${formatWad(days[Number(today)].userBuys)} ETH
                     </td>
@@ -298,14 +265,14 @@ onload = () => setTimeout(() => {
                     </td>
                   </tr>
                   <tr>
-                    <th>Add contribution</th>
+                    <th>Send ETH</th>
                     <td style="text-align: left">
                       <input type=text required id=buy-input
                              placeholder=${formatETH(eth_balance.div(WAD))}>
                       ETH
                       <span style="margin-left: 1.5rem">
                         <button id=buy-button>
-                          Buy EOS tokens
+                          Send ETH
                         </button>
                         <span id=buy-progress class=hidden>
                           Sending ETH...
@@ -346,7 +313,45 @@ onload = () => setTimeout(() => {
                   </tr>
                 </table>
               </form>
-
+              <div class=pane>
+                <table style="width: 100%">
+                  <thead>
+                    <tr>
+                      <th>Window</th>
+                      <th>EOS for sale</th>
+                      <th>Total ETH</th>
+                      <th>Your ETH</th>
+                      <th>Your EOS</th>
+                      <th>Effective price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${days.map((day, i) => i > Number(today) ? `
+                      <tr class=future>
+                        <td>#${day.name}</td>
+                        <td>${formatEOS(day.createOnDay)} EOS</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                      </tr>
+                    ` : `
+                      <tr ${i == Number(today) ? "class=active" : ""}>
+                        <td>
+                          #${day.name}
+                          ${i == Number(today) ? "(open) " : ""}
+                        </td>
+                        <td>${formatEOS(day.createOnDay)} EOS</td>
+                        <td>${formatETH(day.dailyTotal)} ETH</td>
+                        <td>${formatETH(day.userBuys)} ETH</td>
+                        <td>${formatEOS(day.received)} EOS</td>
+                        <td>${day.dailyTotal == 0 ? "n/a" : (
+                          `${day.price.toFixed(9)} ETH/EOS`
+                        )}</td>
+                      </tr>
+                    `).join("\n")}
+                  </tbody>
+                </table>
+              </div>
             ` : `
               <div class=pane>
                 <h3>Ethereum account not found</h3>
@@ -372,7 +377,7 @@ function buy() {
   byId("buy-progress").classList.remove("hidden")
   var wad = getValue("buy-input")
   eos_sale.buy({ value: web3.toWei(wad) }, hopefully(result => {
-    setTimeout(() => location.reload(), 10000)
+    setTimeout(() => location.reload(), 20000)
   }))
 }
 
@@ -380,7 +385,7 @@ function claim() {
   byId("claim-button").classList.add("hidden")
   byId("claim-progress").classList.remove("hidden")
   eos_sale.claimAll(web3.eth.accounts[0], hopefully(result => {
-    setTimeout(() => location.reload(), 10000)
+    setTimeout(() => location.reload(), 20000)
   }))
 }
 
@@ -390,7 +395,7 @@ function transfer() {
   var guy = getValue("transfer-address-input")
   var wad = getValue("transfer-amount-input") * WAD
   eos_token.transfer(guy, wad, hopefully(result => {
-    setTimeout(() => location.reload(), 10000)
+    setTimeout(() => location.reload(), 20000)
   }))
 }
 
@@ -398,7 +403,9 @@ function register() {
   byId("register-button").classList.add("hidden")
   byId("register-progress").classList.remove("hidden")
   var key = getValue("register-input")
-  eos_sale.register(web3.fromAscii(key), hopefully(result => {
-    setTimeout(() => location.reload(), 10000)
+  eos_sale.register(web3.fromAscii(key), {
+    gas: 1000000,
+  }, hopefully(result => {
+    setTimeout(() => location.reload(), 20000)
   }))
 }
