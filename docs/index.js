@@ -2,6 +2,13 @@ var eos_sale_address_kovan  = "0xa17a1237c90c72c93908a8d0a01d32f8bf787251"
 var eos_token_address_kovan = "0x44b6813e8943caaebefd2677d3c8f330d756adcc"
 var eos_sale, eos_token
 
+var kovan = {
+  name: "Kovan",
+  genesis: "0xa3c565fc15c7478862d50ccd6561e3c06b24cc509bf388941c25ea985ce32cb9",
+}
+
+var chain = kovan
+
 var WAD = 1000000000000000000
 
 var hopefully = $ => (error, result) => {
@@ -70,7 +77,13 @@ onload = () => setTimeout(() => {
     eos_sale  = web3.eth.contract(eos_sale_abi).at(eos_sale_address_kovan)
     eos_token = web3.eth.contract(eos_token_abi).at(eos_token_address_kovan)
 
-    refresh()
+    web3.eth.getBlock(0, hopefully(block => {
+      if (block.hash == chain.genesis) {
+        refresh()
+      } else {
+        lament(new Error(`Wrong blockchain; please use ${chain.name}`))
+      }
+    }))
   }
 }, 500)
 
@@ -331,9 +344,9 @@ function refresh() {
                       <th>Window</th>
                       <th>EOS for sale</th>
                       <th>Total ETH</th>
+                      <th>Effective price</th>
                       <th>Your ETH</th>
                       <th>Your EOS</th>
-                      <th>Effective price</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -345,11 +358,11 @@ function refresh() {
                         </td>
                         <td>{formatEOS(day.createOnDay)} EOS</td>
                         <td>{formatETH(day.dailyTotal)} ETH</td>
-                        <td>{formatETH(day.userBuys)} ETH</td>
-                        <td>{formatEOS(day.received)} EOS</td>
                         <td>{day.dailyTotal == 0 ? "n/a" : (
                           `${day.price.toFixed(9)} ETH/EOS`
                         )}</td>
+                        <td>{formatETH(day.userBuys)} ETH</td>
+                        <td>{formatEOS(day.received)} EOS</td>
                       </tr>
                     )}
                   </tbody>
