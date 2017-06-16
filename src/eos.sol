@@ -15,9 +15,11 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     uint                        public startTime;
     uint                        public numberOfDays;
     uint128                     public foundersAllocation;
+    bytes                       public foundersKey;
     uint                        public createPerDay;
     uint                        public createFirstDay;
     uint                        public openTime;
+    uint128                     public totalSupply;
 
     mapping(uint=>uint)         public dailyTotals;
     mapping(uint=>
@@ -38,17 +40,24 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     // @param totalSupply_   - the total number of tokens to be allocated by this contract
     // @param foundersAlloc_ - the number of tokens reserved for founders and not distributed by sale
     // @param foundersKey    - the EOS key that will control the founders allocation in genesis block
-    function EOSSale(uint numberOfDays_, uint128 totalSupply_, uint openTime_, uint startTime_, uint128 foundersAlloc_, bytes foundersKey ) {
+    function EOSSale(uint numberOfDays_, uint128 totalSupply_, uint openTime_, uint startTime_, uint128 foundersAlloc_, bytes foundersKey_) {
         assert( totalSupply_ > foundersAlloc_ );
         assert( openTime_ < startTime_ );
         assert( numberOfDays_ > 0 );
 
-        openTime           = openTime_;
         numberOfDays       = numberOfDays_;
-        EOS                = new DSToken("EOS");
-        EOS.mint(totalSupply_);
-
+        totalSupply        = totalSupply;
+        openTime           = openTime_;
+        startTime          = startTime_;
         foundersAllocation = foundersAlloc_;
+        foundersKey        = foundersKey_;
+    }
+
+    function initialize(DSToken eos) auth {
+        assert(address(EOS) == address(0));
+
+        EOS = eos;
+        EOS.mint(totalSupply);
 
         // transfer foundersAllocation of EOS ERC-20 tokens to founders address and map to founders public key
         // founders ETH address '0xb1' is a provably non-transferrable address
@@ -57,10 +66,8 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
         keys[founders] = foundersKey;
         LogRegister(founders, foundersKey);
 
-
-        createFirstDay     = wmul(totalSupply_, 0.2 ether);
-        createPerDay       = div(sub(sub(totalSupply_,foundersAllocation), createFirstDay), numberOfDays);
-        startTime          = startTime_;
+        createFirstDay     = wmul(totalSupply, 0.2 ether);
+        createPerDay       = div(sub(sub(totalSupply, foundersAllocation), createFirstDay), numberOfDays);
     }
 
     // overrideable for easy solidity tests
