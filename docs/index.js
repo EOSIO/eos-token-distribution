@@ -158,9 +158,9 @@ function refresh() {
             href="https://github.com/eosio/eos-token-sale">contract source
             code</a>.
 
-            <span style={{ position: "absolute", top: 0, right: 0, padding: "1rem 2rem" }}>
-              Refreshed at{" "}
-              <b>{moment(time * 1000).format("LTS")}</b>
+            <span style={{ position: "absolute", top: "1.5rem", left: "15rem", padding: "1rem 2rem", color: "gray" }}>
+              <b style={{ marginRight: ".2rem" }}>Last updated: </b>
+              {moment(time * 1000).format("LTS")}
             </span>
 
             {web3.eth.accounts[0] ? <div>
@@ -178,7 +178,7 @@ function refresh() {
                       {publicKey ? <span>
                         <code>{publicKey}</code>
                         <a href="#" id="register-link" style={{ float: "right" }}
-                           onClick={() => (showPane('register'), event.preventDefault())}>
+                           onClick={event => (showPane('register'), event.preventDefault())}>
                           Change your EOS key
                         </a>
                       </span> : <span>
@@ -186,7 +186,7 @@ function refresh() {
                           (no EOS public key registered)
                         </span>
                         <a href="#" id="register-link" style={{ float: "right" }}
-                           onClick={() => (showPane('register'), event.preventDefault())}>
+                           onClick={event => (showPane('register'), event.preventDefault())}>
                           Register your EOS key
                         </a>
                       </span>}
@@ -198,7 +198,7 @@ function refresh() {
                       {formatETH(eth_balance.div(WAD))} ETH
                       <a href="#" id="buy-link"
                          style={{ marginLeft: "1rem", float: "right" }}
-                         onClick={() => (showPane('buy'), event.preventDefault())}>
+                         onClick={event => (showPane('buy'), event.preventDefault())}>
                         Buy EOS tokens
                       </a>
                     </td>
@@ -210,7 +210,7 @@ function refresh() {
                         {formatEOS(unclaimed)} EOS (unclaimed)
                         <span style={{ marginLeft: "1rem", float: "right" }}>
                           <button id="claim-button"
-                                  onClick={() => (claim(), event.preventDefault())}>
+                                  onClick={event => (claim(), event.preventDefault())}>
                             Claim EOS tokens
                           </button>
                           <span id="claim-progress" className="hidden">
@@ -227,7 +227,7 @@ function refresh() {
                         {formatEOS(eos_balance.div(WAD))} EOS
                         <a href="#" id="transfer-link"
                            style={{ marginLeft: "1rem", float: "right" }}
-                           onClick={() => (showPane('transfer'), event.preventDefault())}>
+                           onClick={event => (showPane('transfer'), event.preventDefault())}>
                           Transfer EOS tokens
                         </a>
                       </td>
@@ -236,7 +236,7 @@ function refresh() {
                 </tbody></table>
               </div>
               <form className="hidden pane" id="register-pane"
-                    onSubmit={() => (register(), event.preventDefault())}>
+                    onSubmit={event => (register(), event.preventDefault())}>
                 <h3>{publicKey ? "Change" : "Register"} EOS public key</h3>
                 <table><tbody>
                   <tr>
@@ -259,14 +259,13 @@ function refresh() {
                 </tbody></table>
               </form>
               <form className="hidden pane" id="buy-pane"
-                    onSubmit={() => (buy(), event.preventDefault())}>
+                    onSubmit={event => (buy(), event.preventDefault())}>
                 <h3>Buy EOS tokens &mdash; sale window #{String(today)}</h3>
                 <table><tbody>
                   <tr>
-                    <th>Timeframe</th>
+                    <th>Closes</th>
                     <td style={{ textAlign: "left" }}>
-                      {days[Number(today)].begins ? `started ${days[today].begins.fromNow()}, ` : ""}
-                      ends {days[Number(today)].ends.fromNow()}
+                      {days[Number(today)].ends.fromNow()}
                     </td>
                   </tr>
                   <tr>
@@ -284,7 +283,7 @@ function refresh() {
                   <tr>
                     <th>Your ETH</th>
                     <td style={{ textAlign: "left" }}>
-                      {formatWad(days[Number(today)].userBuys)} ETH
+                      {formatETH(days[Number(today)].userBuys)} ETH
                     </td>
                   </tr>
                   <tr>
@@ -312,7 +311,7 @@ function refresh() {
                 </tbody></table>
               </form>
               <form className="hidden pane before-error" id="transfer-pane"
-                    onSubmit={() => (transfer(), event.preventDefault())}>
+                    onSubmit={event => (transfer(), event.preventDefault())}>
                 <h3>Transfer EOS tokens to another Ethereum account</h3>
                 <table><tbody>
                   <tr>
@@ -407,6 +406,7 @@ function buy() {
   eos_sale.buy({ value: web3.toWei(wad) }, hopefully(result =>
     ping(result).then(() => {
       hidePanes()
+      byId("buy-input").value = ""
       byId("buy-button").classList.remove("hidden")
       byId("buy-progress").classList.add("hidden")
     })
