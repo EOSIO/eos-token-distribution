@@ -112,12 +112,12 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
         assert( dayFor(timestamp) >= today() ); // allow people to pre-fund future days
         assert( dayFor(timestamp) <= numberOfDays ); // prevent people from prefunding past the end
 
-        if( limit != 0 ) assert( dailyTotals[today()] + msg.value < limit );
+        if( limit != 0 ) assert( dailyTotals[dayFor(timestamp)] + msg.value < limit );
 
-        userBuys[today()][msg.sender] += msg.value;
-        dailyTotals[today()] += msg.value;
+        userBuys[dayFor(timestamp)][msg.sender] += msg.value;
+        dailyTotals[dayFor(timestamp)] += msg.value;
 
-        LogBuy(today(), msg.sender, msg.value);
+        LogBuy(dayFor(timestamp), msg.sender, msg.value);
     }
 
     // buys at the current time with no limit

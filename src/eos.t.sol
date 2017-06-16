@@ -131,11 +131,25 @@ contract EOSSaleTest is DSTest, DSExec {
 
     function testBuyWithLimit() {
         sale.buyWithLimit.value(1 ether)(now, 2 ether);
+        assertEq(sale.userBuys(0, address(this)), 1 ether);
     }
 
     function testFailBuyOverLimit() {
         user1.doBuy(1 ether);
         sale.buyWithLimit.value(1 ether)(now, 1.5 ether);
+    }
+
+    function testBuyOverLimitLaterWindow() {
+        user1.doBuy(1 ether);
+        sale.buyWithLimit.value(1 ether)(now + 24 hours * 3, 1.5 ether);
+    }
+
+    function testBuyLaterWindow() {
+        sale.buyWithLimit.value(1 ether)(now + 24 hours * 3, 2 ether);
+        assertEq(sale.userBuys(0, address(this)), 0);
+        assertEq(sale.userBuys(2, address(this)), 0);
+        assertEq(sale.userBuys(3, address(this)), 1 ether);
+        assertEq(sale.userBuys(4, address(this)), 0);
     }
 
     function testFailBuyTooLate() {
