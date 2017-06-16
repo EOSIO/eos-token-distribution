@@ -48,8 +48,8 @@ contract TestOwner {
 
 contract TestableEOSSale is EOSSale {
 
-    function TestableEOSSale( uint n, uint128 d, uint s, uint128 a, bytes k )
-             EOSSale(n, d, s, a, k) {}
+    function TestableEOSSale( uint n, uint128 t, uint o, uint s, uint128 a, bytes k )
+             EOSSale(n, t, o, s, a, k) {}
     
     uint public localTime;
 
@@ -78,7 +78,7 @@ contract EOSSaleTest is DSTest, DSExec {
 
     function setUp() {
         bytes memory x = new bytes(1);
-        sale = new TestableEOSSale(5, 156.25 ether, block.timestamp + 1 days, 10 ether, x);
+        sale = new TestableEOSSale(5, 156.25 ether, now, block.timestamp + 1 days, 10 ether, x);
         sale.addTime(now + 1);
 
         EOS = sale.EOS();
@@ -115,6 +115,13 @@ contract EOSSaleTest is DSTest, DSExec {
         window++;
     }
 
+    function testFailBuyBeforeOpen() {
+        bytes memory x = new bytes(1);
+        sale = new TestableEOSSale(5, 156.25 ether, now + 1, block.timestamp + 1 days, 10 ether, x);
+        sale.addTime(now);
+        sale.buy.value(1 ether)();
+    }
+
     function testBuy() {
         sale.buy.value(1 ether)();
     }
@@ -131,10 +138,6 @@ contract EOSSaleTest is DSTest, DSExec {
     function testFailBuyTooLate() {
         addTime();
         sale.buyWithLimit.value(1 ether)(now, 0);
-    }
-
-    function testFailBuyTooEarly() {
-        sale.buyWithLimit.value(1 ether)(now + 1 days, 0);
     }
 
     function testBuyFirstDay() {
@@ -338,14 +341,6 @@ contract EOSSaleTest is DSTest, DSExec {
 
         sale.claim(this);
         assertEq(EOS.balanceOf(this), 77.25 ether);
-    }
-
-
-    function testFallbackBuy() {
-        exec(sale, 1 ether);
-        addTime();
-        sale.claim(0, this);
-        assertEq(EOS.balanceOf(this), 31.25 ether);
     }
 
     function testRegister() {
