@@ -46,7 +46,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
         assert( numberOfDays_ > 0 );
 
         numberOfDays       = numberOfDays_;
-        totalSupply        = totalSupply;
+        totalSupply        = totalSupply_;
         openTime           = openTime_;
         startTime          = startTime_;
         foundersAllocation = foundersAlloc_;
