@@ -26,6 +26,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
         mapping(address=>bool)) public claimed;
 
 
+    event LogBuy(uint day, address who, uint wad);
     event LogClaim(uint day, address who, uint wad);
     event LogCollect(uint wad);
     event LogRegister(address who, bytes key);
@@ -108,6 +109,8 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
 
         userBuys[today()][msg.sender] += msg.value;
         dailyTotals[today()] += msg.value;
+
+        LogBuy(today(), msg.sender, msg.value);
 
         // save msg.sender if buyer hasn't registered already, this loop
         // converts fixed sized sender into dynamic sized bytes
