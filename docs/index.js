@@ -218,36 +218,32 @@ function render({
                       </a>
                     </td>
                   </tr>
-                  {unclaimed.equals(0) ? null :
-                    <tr>
-                      <th></th>
-                      <td style={{ textAlign: "left" }}>
-                        {formatEOS(unclaimed)} EOS (unclaimed)
-                        <span style={{ marginLeft: "1rem", float: "right" }}>
-                          <button id="claim-button"
-                                  onClick={event => (event.preventDefault(), claim())}>
-                            Claim EOS tokens
-                          </button>
-                          <span id="claim-progress" className="hidden">
-                            Claiming tokens...
-                          </span>
+                  <tr>
+                    <th></th>
+                    <td style={{ textAlign: "left" }}>
+                      {formatEOS(unclaimed)} EOS (unclaimed)
+                      <span style={{ marginLeft: "1rem", float: "right" }}>
+                        <button id="claim-button" disabled={unclaimed.equals(0)}
+                                onClick={event => (event.preventDefault(), claim())}>
+                          Claim EOS tokens
+                        </button>
+                        <span id="claim-progress" className="hidden">
+                          Claiming tokens...
                         </span>
-                      </td>
-                    </tr>
-                  }
-                  {eos_balance.equals(0) ? null :
-                    <tr>
-                      <th></th>
-                      <td style={{ textAlign: "left" }}>
-                        {formatEOS(eos_balance.div(WAD))} EOS
-                        <a href="#" id="transfer-link"
-                           style={{ marginLeft: "1rem", float: "right" }}
-                           onClick={event => (event.preventDefault(), showPane('transfer'))}>
-                          Transfer EOS tokens
-                        </a>
-                      </td>
-                    </tr>
-                  }
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th></th>
+                    <td style={{ textAlign: "left" }}>
+                      {formatEOS(eos_balance.div(WAD))} EOS
+                      <a href="#" id="transfer-link"
+                         style={{ marginLeft: "1rem", float: "right" }}
+                         onClick={event => (event.preventDefault(), showPane('transfer'))}>
+                        Transfer EOS tokens
+                      </a>
+                    </td>
+                  </tr>
                 </tbody></table>
               </div>
               <form className="hidden pane" id="register-pane"
@@ -342,6 +338,7 @@ function render({
                     <td style={{ textAlign: "left" }}>
                       <input placeholder="0x0123456789abcdef0123456789abcdef01234567"
                              id="transfer-address-input" required
+                             minLength={42} maxLength={42}
                              style={{ width: "100%" }}/>
                     </td>
                   </tr>
@@ -351,7 +348,7 @@ function render({
                       <input placeholder={formatEOS(eos_balance.div(WAD))}
                              id="transfer-amount-input" required
                              style={{ width: "15em" }}/>
-                      EOS
+                      {" EOS"}
                       <span style={{ marginLeft: "1rem" }}>
                         <button id="transfer-button">
                           Transfer EOS tokens
