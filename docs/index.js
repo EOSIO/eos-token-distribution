@@ -114,8 +114,8 @@ onload = () => setTimeout(() => {
             return i < Number(today) && !x.claimed
           }).reduce((a, x) => x.received.plus(a), web3.toBigNumber(0))
 
-          render("app", `
-            <p style="width: 80%">
+          react("app", <div>
+            <p style={{ width: "80%" }}>
 
               The EOS Token Sale will distributed daily over about 341
               days.  1,000,000,000 (one billion) EOS tokens will be minted
@@ -127,194 +127,190 @@ onload = () => setTimeout(() => {
             </p>
 
             For more details, please review the token sale <a
-            href=https://github.com/eosio/eos-token-sale>contract source
+            href="https://github.com/eosio/eos-token-sale">contract source
             code</a>.
 
-            ${web3.eth.accounts[0] ? `
-              <div class=pane>
-                <table>
+            {web3.eth.accounts[0] ? <div>
+              <div className="pane">
+                <table><tbody>
                   <tr>
                     <th>Ethereum account</th>
-                    <td style="width: 45rem; text-align: left">
-                      <code>${web3.eth.accounts[0]}</code>
+                    <td style={{ width: "45rem", textAlign: "left" }}>
+                      <code>{web3.eth.accounts[0]}</code>
                     </td>
                   </tr>
                   <tr>
                     <th>EOS public key</th>
-                    <td style="text-align: left">
-                      ${publicKey ? `
-                        <code>${publicKey}</code>
-                        <a href=# id=register-link style="float: right"
-                           onclick="showPane('register'),
-                                    event.preventDefault()">
+                    <td style={{ textAlign: "left" }}>
+                      {publicKey ? <span>
+                        <code>{publicKey}</code>
+                        <a href="#" id="register-link" style={{ float: "right" }}
+                           onClick={() => (showPane('register'), event.preventDefault())}>
                           Change your EOS key
                         </a>
-                      ` : `
-                        <span style="color: gray">
+                      </span> : <span>
+                        <span style={{ color: "gray" }}>
                           (no EOS public key registered)
                         </span>
-                        <a href=# id=register-link style="float: right"
-                           onclick="showPane('register'),
-                                    event.preventDefault()">
+                        <a href="#" id="register-link" style={{ float: "right" }}
+                           onClick={() => (showPane('register'), event.preventDefault())}>
                           Register your EOS key
                         </a>
-                      `}
+                      </span>}
                     </td>
                   </tr>
                   <tr>
                     <th>Token balances</th>
-                    <td style="text-align: left">
-                      ${formatETH(eth_balance.div(WAD))} ETH
-                      <a href=# id=buy-link
-                         style="margin-left: 1rem; float: right"
-                         onclick="showPane('buy'),
-                                  event.preventDefault()">
+                    <td style={{ textAlign: "left" }}>
+                      {formatETH(eth_balance.div(WAD))} ETH
+                      <a href="#" id="buy-link"
+                         style={{ marginLeft: "1rem", float: "right" }}
+                         onClick={() => (showPane('buy'), event.preventDefault())}>
                         Buy EOS tokens
                       </a>
                     </td>
                   </tr>
-                  ${unclaimed.equals(0) ? "" : `
+                  {unclaimed.equals(0) ? null :
                     <tr>
                       <th></th>
-                      <td style="text-align: left">
-                        ${formatEOS(unclaimed)} EOS (unclaimed)
-                        <span style="margin-left: 1rem; float: right">
-                          <button id=claim-button
-                                  onclick="claim(), event.preventDefault()">
+                      <td style={{ textAlign: "left" }}>
+                        {formatEOS(unclaimed)} EOS (unclaimed)
+                        <span style={{ marginLeft: "1rem", float: "right" }}>
+                          <button id="claim-button"
+                                  onClick={() => (claim(), event.preventDefault())}>
                             Claim EOS tokens
                           </button>
-                          <span id=claim-progress class=hidden>
+                          <span id="claim-progress" className="hidden">
                             Claiming tokens...
                           </span>
                         </span>
                       </td>
                     </tr>
-                  `}
-                  ${eos_balance.equals(0) ? "" : `
+                  }
+                  {eos_balance.equals(0) ? null :
                     <tr>
                       <th></th>
-                      <td style="text-align: left">
-                        ${formatEOS(eos_balance.div(WAD))} EOS
-                        <a href=# id=transfer-link
-                           style="margin-left: 1rem; float: right"
-                           onclick="showPane('transfer'),
-                                    event.preventDefault()">
+                      <td style={{ textAlign: "left" }}>
+                        {formatEOS(eos_balance.div(WAD))} EOS
+                        <a href="#" id="transfer-link"
+                           style={{ marginLeft: "1rem", float: "right" }}
+                           onClick={() => (showPane('transfer'), event.preventDefault())}>
                           Transfer EOS tokens
                         </a>
                       </td>
                     </tr>
-                  `}
-                </table>
+                  }
+                </tbody></table>
               </div>
-              <form class="hidden pane" id=register-pane
-                    onsubmit="register(), event.preventDefault()">
-                <h3>${publicKey ? "Change" : "Register"} EOS public key</h3>
-                <table>
+              <form className="hidden pane" id="register-pane"
+                    onSubmit={() => (register(), event.preventDefault())}>
+                <h3>{publicKey ? "Change" : "Register"} EOS public key</h3>
+                <table><tbody>
                   <tr>
                     <th>Public key</th>
-                    <td style="text-align: left">
-                      <input value=${escape(publicKey)}
-                             id=register-input required
-                             minlength=33 maxlength=33
-                             style="width: 30em; font-family: monospace">
-                      <span style="margin-left: 1rem">
-                        <button id=register-button>
-                          ${publicKey ? "Change" : "Register"} key
+                    <td style={{ textAlign: "left" }}>
+                      <input //defaultValue={escape(publicKey)}
+                             id="register-input" required
+                             minLength={33} maxLength={33}
+                             style={{ width: "30em", fontFamily: "monospace" }}/>
+                      <span style={{ marginLeft: "1rem" }}>
+                        <button id="register-button">
+                          {publicKey ? "Change" : "Register"} key
                         </button>
-                        <span id=register-progress class=hidden>
+                        <span id="register-progress" className="hidden">
                           Registering key...
                         </span>
                       </span>
                     </td>
                   </tr>
-                </table>
+                </tbody></table>
               </form>
-              <form class="hidden pane" id=buy-pane
-                    onsubmit="buy(), event.preventDefault()">
-                <h3>Buy EOS tokens &mdash; sale window #${today}</h3>
-                <table>
+              <form className="hidden pane" id="buy-pane"
+                    onSubmit={() => (buy(), event.preventDefault())}>
+                <h3>Buy EOS tokens &mdash; sale window #{String(today)}</h3>
+                <table><tbody>
                   <tr>
                     <th>Timeframe</th>
-                    <td style="text-align: left">
-                      ${days[Number(today)].begins ? `started ${days[today].begins.fromNow()}, ` : ""}
-                      ends ${days[Number(today)].ends.fromNow()}
+                    <td style={{ textAlign: "left" }}>
+                      {days[Number(today)].begins ? `started ${days[today].begins.fromNow()}, ` : ""}
+                      ends {days[Number(today)].ends.fromNow()}
                     </td>
                   </tr>
                   <tr>
                     <th>EOS for sale</th>
-                    <td style="text-align: left">
-                      ${formatEOS(days[Number(today)].createOnDay)} EOS
+                    <td style={{ textAlign: "left" }}>
+                      {formatEOS(days[Number(today)].createOnDay)} EOS
                     </td>
                   </tr>
                   <tr>
                     <th>Total ETH</th>
-                    <td style="text-align: left">
-                      ${formatETH(days[Number(today)].dailyTotal)} ETH
+                    <td style={{ textAlign: "left" }}>
+                      {formatETH(days[Number(today)].dailyTotal)} ETH
                     </td>
                   </tr>
                   <tr>
                     <th>Your ETH</th>
-                    <td style="text-align: left">
-                      ${formatWad(days[Number(today)].userBuys)} ETH
+                    <td style={{ textAlign: "left" }}>
+                      {formatWad(days[Number(today)].userBuys)} ETH
                     </td>
                   </tr>
                   <tr>
                     <th>Effective price</th>
-                    <td style="text-align: left">
-                      ${days[Number(today)].price.toFixed(9)} ETH/EOS
+                    <td style={{ textAlign: "left" }}>
+                      {days[Number(today)].price.toFixed(9)} ETH/EOS
                     </td>
                   </tr>
                   <tr>
                     <th>Send ETH</th>
-                    <td style="text-align: left">
-                      <input type=text required id=buy-input
-                             placeholder=${formatETH(eth_balance.div(WAD))}>
-                      ETH
-                      <span style="margin-left: 1.5rem">
-                        <button id=buy-button>
+                    <td style={{ textAlign: "left" }}>
+                      <input type="text" required id="buy-input"
+                             placeholder={formatETH(eth_balance.div(WAD))}/>
+                      {" ETH"}
+                      <span style={{ marginLeft: "1.5rem" }}>
+                        <button id="buy-button">
                           Send ETH
                         </button>
-                        <span id=buy-progress class=hidden>
+                        <span id="buy-progress" className="hidden">
                           Sending ETH...
                         </span>
                       </span>
                     </td>
                   </tr>
-                </table>
+                </tbody></table>
               </form>
-              <form class="hidden pane before-error" id=transfer-pane
-                    onsubmit="transfer(), event.preventDefault()">
+              <form className="hidden pane before-error" id="transfer-pane"
+                    onSubmit={() => (transfer(), event.preventDefault())}>
                 <h3>Transfer EOS tokens to another Ethereum account</h3>
-                <table>
+                <table><tbody>
                   <tr>
                     <th>Recipient account</th>
-                    <td style="text-align: left">
-                      <input placeholder=0x0123456789abcdef0123456789abcdef01234567
-                             id=transfer-address-input required
-                             style="width: 100%">
+                    <td style={{ textAlign: "left" }}>
+                      <input placeholder="0x0123456789abcdef0123456789abcdef01234567"
+                             id="transfer-address-input" required
+                             style={{ width: "100%" }}/>
                     </td>
                   </tr>
                   <tr>
                     <th>Transfer amount</th>
-                    <td style="text-align: left">
-                      <input placeholder=${formatEOS(eos_balance.div(WAD))}
-                             id=transfer-amount-input required
-                             style="width: 15em">
+                    <td style={{ textAlign: "left" }}>
+                      <input placeholder={formatEOS(eos_balance.div(WAD))}
+                             id="transfer-amount-input" required
+                             style={{ width: "15em" }}/>
                       EOS
-                      <span style="margin-left: 1rem">
-                        <button id=transfer-button>
+                      <span style={{ marginLeft: "1rem" }}>
+                        <button id="transfer-button">
                           Transfer EOS tokens
                         </button>
-                        <span id=transfer-progress class=hidden>
+                        <span id="transfer-progress" className="hidden">
                           Transferring tokens...
                         </span>
                       </span>
                     </td>
                   </tr>
-                </table>
+                </tbody></table>
               </form>
-              <div class=pane>
-                <table style="width: 100%">
+              <div className="pane">
+                <table style={{ width: "100%" }}>
                   <thead>
                     <tr>
                       <th>Window</th>
@@ -326,26 +322,26 @@ onload = () => setTimeout(() => {
                     </tr>
                   </thead>
                   <tbody>
-                    ${days.map((day, i) => `
-                      <tr ${i == Number(today) ? "class=active" : ""}>
+                    {days.map((day, i) =>
+                      <tr key={i} className={i == Number(today) ? "active" : ""}>
                         <td>
-                          #${day.name}
-                          ${i == Number(today) ? "" : ""}
+                          #{day.name}
+                          {i == Number(today) ? "" : ""}
                         </td>
-                        <td>${formatEOS(day.createOnDay)} EOS</td>
-                        <td>${formatETH(day.dailyTotal)} ETH</td>
-                        <td>${formatETH(day.userBuys)} ETH</td>
-                        <td>${formatEOS(day.received)} EOS</td>
-                        <td>${day.dailyTotal == 0 ? "n/a" : (
+                        <td>{formatEOS(day.createOnDay)} EOS</td>
+                        <td>{formatETH(day.dailyTotal)} ETH</td>
+                        <td>{formatETH(day.userBuys)} ETH</td>
+                        <td>{formatEOS(day.received)} EOS</td>
+                        <td>{day.dailyTotal == 0 ? "n/a" : (
                           `${day.price.toFixed(9)} ETH/EOS`
                         )}</td>
                       </tr>
-                    `).join("\n")}
+                    )}
                   </tbody>
                 </table>
               </div>
-            ` : `
-              <div class="pane before-error">
+            </div> :
+              <div className="pane before-error">
                 <h3>Ethereum account not found</h3>
 
                 It looks like an Ethereum client is available in your
@@ -353,11 +349,11 @@ onload = () => setTimeout(() => {
                 If you&rsquo;re using MetaMask, you may need to unlock
                 your account. You can also try disabling and re-enabling
                 the MetaMask plugin by going to <a
-                href=chrome://extensions>chrome://extensions</a>.
+                href="chrome://extensions">chrome://extensions</a>.
 
               </div>
-            `}
-          `)
+            }
+          </div>)
         }))
       }))
     }))

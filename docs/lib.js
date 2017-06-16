@@ -10,3 +10,4 @@ var repeat     = (x, n)      => new Array(n + 1).join("x")
 var adjust     = (x, f)      => { x.innerHTML = f(x.innerHTML) }
 var append     = (id, html)  => { adjust(byId(id), x => x + html) }
 var render     = (id, html)  => { adjust(byId(id), () => html) }
+var react      = (id, jsx)   => ReactDOM.render(jsx, byId(id))
