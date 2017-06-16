@@ -2,6 +2,8 @@ var eos_sale_address_kovan  = "0x99d7610720ea231cbe3951a2b87478ac79be912a"
 var eos_token_address_kovan = "0xba865771934da615536e56d9a71ceb43c67ef5cd"
 var eos_sale, eos_token
 
+var state
+
 var kovan = {
   name: "Kovan",
   genesis: "0xa3c565fc15c7478862d50ccd6561e3c06b24cc509bf388941c25ea985ce32cb9",
@@ -142,7 +144,20 @@ function refresh() {
             return i < Number(today) && !x.claimed
           }).reduce((a, x) => x.received.plus(a), web3.toBigNumber(0))
 
-          resolve(react("app", <div>
+          resolve(update({
+            time, days, unclaimed, today, eth_balance, eos_balance, publicKey,
+            ...(state ? { } : { buyWindow: today }),
+          }))
+        }))
+      }))
+    }))
+  })
+}
+
+function render({
+  time, days, unclaimed, today, eth_balance, eos_balance, publicKey, buyWindow,
+}) {
+  return <div>
             <p style={{ width: "80%" }}>
 
               The EOS Token Sale will distributed daily over about 341
@@ -260,36 +275,44 @@ function refresh() {
               </form>
               <form className="hidden pane" id="buy-pane"
                     onSubmit={event => (buy(), event.preventDefault())}>
-                <h3>Buy EOS tokens &mdash; sale window #{String(today)}</h3>
+                <h3>Buy EOS tokens</h3>
                 <table><tbody>
+                  <tr>
+                    <th>Sale window</th>
+                    <td style={{ textAlign: "left" }}>
+                      <select id="sale-window" value={buyWindow } onChange={e => update({ buyWindow: e.target.value })}>
+                        {days.map((d, i) => <option value={i} selected={i == buyWindow}>Window #{i}</option>)}
+                      </select>
+                    </td>
+                  </tr>
                   <tr>
                     <th>Closes</th>
                     <td style={{ textAlign: "left" }}>
-                      {days[Number(today)].ends.fromNow()}
+                      {days[buyWindow].ends.fromNow()}
                     </td>
                   </tr>
                   <tr>
                     <th>EOS for sale</th>
                     <td style={{ textAlign: "left" }}>
-                      {formatEOS(days[Number(today)].createOnDay)} EOS
+                      {formatEOS(days[buyWindow].createOnDay)} EOS
                     </td>
                   </tr>
                   <tr>
                     <th>Total ETH</th>
                     <td style={{ textAlign: "left" }}>
-                      {formatETH(days[Number(today)].dailyTotal)} ETH
+                      {formatETH(days[buyWindow].dailyTotal)} ETH
                     </td>
                   </tr>
                   <tr>
                     <th>Your ETH</th>
                     <td style={{ textAlign: "left" }}>
-                      {formatETH(days[Number(today)].userBuys)} ETH
+                      {formatETH(days[buyWindow].userBuys)} ETH
                     </td>
                   </tr>
                   <tr>
                     <th>Effective price</th>
                     <td style={{ textAlign: "left" }}>
-                      {days[Number(today)].price.toFormat(9)} ETH/EOS
+                      {days[buyWindow].price.toFormat(9)} ETH/EOS
                     </td>
                   </tr>
                   <tr>
@@ -391,11 +414,7 @@ function refresh() {
 
               </div>
             }
-          </div>))
-        }))
-      }))
-    }))
-  })
+          </div>
 }
 
 
@@ -463,4 +482,9 @@ function ping(tx) {
 
 function poll() {
   refresh().then(() => setTimeout(poll, 3000))
+}
+
+function update(x) {
+  state = { ...state, ...x }
+  react("app", render(state))
 }
