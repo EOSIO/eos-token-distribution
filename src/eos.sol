@@ -49,9 +49,9 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
 
         foundersAllocation = foundersAlloc_;
 
-        // TODO: transfer foundersAllocation of EOS ERC-20 tokens to founders address and map to founders public key
-        // founders ETH address needs to be a provably non-transferrable address
-        address founders; // NULL address is provably not transferrable 
+        // transfer foundersAllocation of EOS ERC-20 tokens to founders address and map to founders public key
+        // founders ETH address '0xb1' is a provably non-transferrable address
+        address founders = 0xb1; 
         EOS.push(founders, foundersAllocation);
         keys[founders] = foundersKey;
         LogRegister(founders, foundersKey);
