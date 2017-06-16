@@ -7,6 +7,7 @@ import 'ds-math/math.sol';
 import 'ds-note/note.sol';
 import 'ds-token/token.sol';
 import 'ds-exec/exec.sol';
+import 'gnosis-multisig/MultiSigWallet.sol';
 
 
 contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
