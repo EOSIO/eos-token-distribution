@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -e
+
+export ETH_GAS=4000000
+
+eos=$(set -x; dapp create DSToken \
+  $(seth --to-bytes32 $(seth --from-ascii EOS))
+)
+
+sale=$(set -x; dapp create EOSSale 7 \
+  $(seth --to-uint256 $(seth --to-wei 1000000000 eth)) \
+  $(date +%s -d '10 minutes') \
+  $(date +%s -d '3 days') \
+  $(seth --to-uint256 $(seth --to-wei 100000000 eth)) \
+  $(seth --from-ascii abcdefghijklmnopqrstuvwxyzABCDEFG)
+)
+
+(set -x; seth send "$eos" "setOwner(address)" "$sale")
+(set -x; seth send "$sale" "initialize(address)" "$eos")
+
+echo "eos=$eos"
+echo "sale=$sale"
