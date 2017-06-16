@@ -35,6 +35,15 @@ function showPane(name) {
   hide(`${name}-link`)
 }
 
+function hidePanes() {
+  for (var x of "transfer buy register".split(" ")) {
+    try {
+      show(`${x}-link`)
+      hide(`${x}-pane`)
+    } catch (error) {}
+  }
+}
+
 onload = () => setTimeout(() => {
   if (!window.web3) {
     render("app", `
@@ -61,6 +70,12 @@ onload = () => setTimeout(() => {
     eos_sale  = web3.eth.contract(eos_sale_abi).at(eos_sale_address_kovan)
     eos_token = web3.eth.contract(eos_token_abi).at(eos_token_address_kovan)
 
+    refresh()
+  }
+}, 500)
+
+function refresh() {
+  return new Promise((resolve, reject) => {
     web3.eth.getBlock("latest", hopefully(block => {
       var time = block.timestamp
 
@@ -114,7 +129,7 @@ onload = () => setTimeout(() => {
             return i < Number(today) && !x.claimed
           }).reduce((a, x) => x.received.plus(a), web3.toBigNumber(0))
 
-          react("app", <div>
+          resolve(react("app", <div>
             <p style={{ width: "80%" }}>
 
               The EOS Token Sale will distributed daily over about 341
@@ -353,20 +368,25 @@ onload = () => setTimeout(() => {
 
               </div>
             }
-          </div>)
+          </div>))
         }))
       }))
     }))
-  }
-}, 500)
+  })
+}
+
 
 function buy() {
   byId("buy-button").classList.add("hidden")
   byId("buy-progress").classList.remove("hidden")
   var wad = getValue("buy-input")
-  eos_sale.buy({ value: web3.toWei(wad) }, hopefully(result => {
-    setTimeout(() => location.reload(), 20000)
-  }))
+  eos_sale.buy({ value: web3.toWei(wad) }, hopefully(result =>
+    ping(result).then(() => {
+      hidePanes()
+      byId("buy-button").classList.remove("hidden")
+      byId("buy-progress").classList.add("hidden")
+    })
+  ))
 }
 
 function claim() {
@@ -374,9 +394,11 @@ function claim() {
   byId("claim-progress").classList.remove("hidden")
   eos_sale.claimAll(web3.eth.accounts[0], {
     gas: 2000000,
-  }, hopefully(result => {
-    setTimeout(() => location.reload(), 20000)
-  }))
+  }, hopefully(result => ping(result).then(() => {
+    hidePanes()
+    byId("claim-button").classList.add("hidden")
+    byId("claim-progress").classList.remove("hidden")
+  })))
 }
 
 function transfer() {
@@ -384,9 +406,11 @@ function transfer() {
   byId("transfer-progress").classList.remove("hidden")
   var guy = getValue("transfer-address-input")
   var wad = getValue("transfer-amount-input") * WAD
-  eos_token.transfer(guy, wad, hopefully(result => {
-    setTimeout(() => location.reload(), 20000)
-  }))
+  eos_token.transfer(guy, wad, hopefully(result => ping(result).then(() => {
+    hidePanes()
+    byId("transfer-button").classList.remove("hidden")
+    byId("transfer-progress").classList.add("hidden")
+  })))
 }
 
 function register() {
@@ -395,7 +419,20 @@ function register() {
   var key = getValue("register-input")
   eos_sale.register(web3.fromAscii(key), {
     gas: 1000000,
-  }, hopefully(result => {
-    setTimeout(() => location.reload(), 20000)
-  }))
+  }, hopefully(result => ping(result).then(() => {
+    hidePanes()
+    byId("register-button").classList.remove("hidden")
+    byId("register-progress").classList.add("hidden")
+  })))
+}
+
+function ping(tx) {
+  return new Promise((resolve, reject) => {
+    function f() {
+      web3.eth.getTransactionReceipt(
+        tx, (err, x) => x ? refresh().then(() => resolve(x))
+          : setTimeout(f, 1000))
+    }
+    f()
+  })
 }
