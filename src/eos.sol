@@ -56,6 +56,10 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     function initialize(DSToken eos) auth {
         assert(address(EOS) == address(0));
 
+        // guarantee that this contract is the sole owner of the DSToken
+        assert(eos.owner() == address(this));
+        assert(eos.authority() == DSAuthority(0));
+
         EOS = eos;
         EOS.mint(totalSupply);
 
@@ -68,6 +72,11 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
 
         createFirstDay     = wmul(totalSupply, 0.2 ether);
         createPerDay       = div(sub(sub(totalSupply, foundersAllocation), createFirstDay), numberOfDays);
+    }
+
+    modifier initialized() {
+        assert(address(EOS) != address(0));
+        _;
     }
 
     // overrideable for easy solidity tests
@@ -105,7 +114,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     // this method provides the buyer some protections regarding which day the buy 
     // order is submitted and the maximum price prior to applying this payment that will
     // be allowed.
-    function buyWithLimit( uint timestamp, uint limit ) note payable {
+    function buyWithLimit( uint timestamp, uint limit ) initialized note payable {
         assert( time() > openTime  );
         assert( 0.01 ether <= msg.value && msg.value <= 1000 ether ); // min / max 
         assert( today() <= numberOfDays ); // prevent funds after last day
@@ -121,13 +130,13 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     }
 
     // buys at the current time with no limit
-    function buy() note payable {
+    function buy() initialized note payable {
        buyWithLimit( time(), 0 );
     }
 
     // This will have small rounding errors, but the token is going to be
     // truncated to 8 or less decimal places anyway when it is launched on own chain.
-    function claim(uint day, address who) note {
+    function claim(uint day, address who) initialized note {
         assert( today() > day );
         if (claimed[day][who]) return;
         var dailyTotal = cast(dailyTotals[day]); // eth-style fixed-point 
@@ -142,7 +151,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
         LogClaim(day, who, reward);
     }
 
-    function claimAll(address who) note {
+    function claimAll(address who) initialized note {
         for (uint i = 0; i < today(); i++) {
             claim(i, who);
         }
@@ -152,7 +161,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     // policy. Manually registering requires a 33 byte public key
     // base58 encoded using the STEEM, BTS, or EOS public key format
     mapping(address=>string)   public keys;
-    function register(string key) note {
+    function register(string key) initialized note {
         assert( today() <=  numberOfDays + 1 );
         assert(bytes(key).length <= 64);
         keys[msg.sender] = key;
