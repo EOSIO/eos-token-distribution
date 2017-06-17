@@ -1,6 +1,9 @@
-name            eos-token
-description
-version         0.0.1
+name            eos-token-sale
+description     Token sale contract and web-based UI for EOS
+version         0.9.5
 
-author          nikolai
-license         Apache-2.0
+author          Daniel Larimer <dan.larimer@block.one>
+author          Nikolai Mushegian <nikolai@dapphub.com>
+author          Andy Milenius <andy@dapphub.com>
+author          Daniel Brockman <daniel@dapphub.com>
+author          Mikael Brockman <mikael@dapphub.com>
