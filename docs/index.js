@@ -488,9 +488,8 @@ function claim() {
   eos_sale.claimAll(web3.eth.accounts[0], {
     gas: 2000000,
   }, hopefully(result => ping(result).then(() => {
-    hidePanes()
-    byId("claim-button").classList.add("hidden")
-    byId("claim-progress").classList.remove("hidden")
+    byId("claim-button").classList.remove("hidden")
+    byId("claim-progress").classList.add("hidden")
   })))
 }
 
