@@ -19,6 +19,10 @@ contract TestUser is DSExec {
         sale.buy.value(wad)();
     }
 
+    function doBuyWithLimit(uint wad, uint timestamp, uint limit) {
+        sale.buyWithLimit.value(wad)(timestamp, limit);
+    }
+
     function doFreeze() {
         sale.freeze();
     }
@@ -371,5 +375,61 @@ contract EOSSaleTest is DSTest, DSExec {
     function testFailRegister() {
         string memory x = new string(100);
         sale.register(x);
+    }
+}
+
+contract EOSSalePreInitTests is DSTest {
+
+    TestableEOSSale sale;
+    TestUser user1;
+
+    function setUp() {
+        string memory x = new string(1);
+
+        sale = new TestableEOSSale(5, 156.25 ether, now, block.timestamp + 1 days, 10 ether, x);
+
+        user1 = new TestUser(sale);
+
+        user1.transfer(100 ether);
+        sale.addTime(now + 1);
+    }
+
+    // Ensure that client facing methods fail before initialize is called
+    function testFailBuy() {
+        user1.doBuy(1 ether);
+    }
+
+    function testFailBuyWithLimit() {
+        user1.doBuyWithLimit(1 ether, now + 1 days, 2 ether);
+    }
+
+    function testFailClaim() {
+        sale.addTime(1 days);
+        sale.claim(0, user1);
+    }
+
+    function testFailClaimAll() {
+        sale.addTime(6 days);
+        sale.claimAll(user1);
+    }
+
+    function testFailRegister() {
+        string memory x = new string(56);
+        sale.register(x);
+    }
+
+    // Ensure that initialize fails if the token has other authorized callers
+    function testFailTokenAuthority() {
+        DSToken EOS = new DSToken("EOS");
+
+        // authorize another user to manipulate the token
+        DSGuard guard = new DSGuard();
+        guard.okay(user1, sale);
+        EOS.setAuthority(guard);
+
+        // hand tainted token to sale
+        EOS.setOwner(sale);
+
+        sale.initialize(EOS);
     }
 }
