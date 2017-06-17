@@ -110,6 +110,9 @@ function refresh() {
 
         if (publicKey.length > 42) {
           publicKey = web3.toAscii(publicKey)
+        } else if (publicKey === '') {
+          publicKey = null
+          byId("app").addEventListener("mousemove", entropyEvent, {capture: false, passive: true})
         }
 
         async.map(iota(Number(days) + 1), (i, $) => {
@@ -192,16 +195,16 @@ function render({
                     <td style={{ textAlign: "left" }}>
                       {publicKey ? <span>
                         <code>{publicKey}</code>
-                        <a href="#" id="register-link" style={{ float: "right" }}
-                           onClick={event => (event.preventDefault(), showPane('register'))}>
+                        <a href="#" id="generate-link" style={{ float: "right" }}
+                           onClick={event => (event.preventDefault(), showPane('generate'))}>
                           Change your EOS key
                         </a>
                       </span> : <span>
                         <span style={{ color: "gray" }}>
                           (no EOS public key registered)
                         </span>
-                        <a href="#" id="register-link" style={{ float: "right" }}
-                           onClick={event => (event.preventDefault(), showPane('register'))}>
+                        <a href="#" id="generate-link" style={{ float: "right" }}
+                           onClick={event => (generate(), event.preventDefault())}>
                           Register your EOS key
                         </a>
                       </span>}
@@ -246,6 +249,48 @@ function render({
                   </tr>
                 </tbody></table>
               </div>
+              <form className="hidden pane" id="generate-pane"
+                  onSubmit={event => (event.preventDefault(), generateConfirm())}>
+                <span id="generate-progress">
+                  Generating key...
+                </span>
+                <div id="generate-confirm" className="hidden">
+                  <h3>Generate EOS key</h3>
+                  You must save this "Private key" in a safe location before registering.  Copy
+                  and paste this key into your backup file and if it is a USB, safly eject.  You
+                  should make more than one copy.  Finally, paste the private key into the field
+                  below when you are done and click "Continue" ..
+
+                  <p>This section is work-in-proress and may change..</p>
+
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th>Private key</th>
+                        <td style={{textAlign: 'left'}}>
+                          <span id="generate-privkey" style={{width: '30em'}}>&nbsp;</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Confirm Private Key</th>
+                        <td>
+                          <input name="wif" type="password"
+                            id="generate-confirm-input" style={{width: '30em'}}
+                            autoComplete="off"/>
+                          <p id="generate-unmatched" className="hidden">
+                            <span style={{color: 'red'}}>
+                              Please check the confirmed key again, it does not match.
+                            </span>
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <button id="generate-button">
+                    Continue
+                  </button>
+                </div>
+              </form>
               <form className="hidden pane" id="register-pane"
                     onSubmit={event => (event.preventDefault(), register())}>
                 <h3>{publicKey ? "Change" : "Register"} EOS public key</h3>
@@ -253,10 +298,14 @@ function render({
                   <tr>
                     <th>Public key</th>
                     <td style={{ textAlign: "left" }}>
-                      <input //defaultValue={escape(publicKey)}
-                             id="register-input" required
-                             minLength={33} maxLength={33}
-                             style={{ width: "30em", fontFamily: "monospace" }}/>
+                      {publicKey ? <span>
+                        <input //defaultValue={escape(publicKey)}
+                          id="register-input" required
+                          minLength={33} maxLength={33}
+                          style={{ width: "30em", fontFamily: "monospace" }}/>
+                      </span> : <span>
+                        <span id="generate-pubkey" style={{width: "30em"}}>&nbsp;</span>
+                      </span>}
                       <span style={{ marginLeft: "1rem" }}>
                         <button id="register-button">
                           {publicKey ? "Change" : "Register"} key
@@ -457,10 +506,49 @@ function transfer() {
   })))
 }
 
+function entropyEvent(e) {
+  var {key_utils} = eos_ecc
+  if(e.type === 'mousemove')
+      key_utils.addEntropy(e.pageX, e.pageY, e.screenX, e.screenY)
+  else
+      console.log('onEntropyEvent Unknown', e.type, e)
+}
+
+function generate() {
+  showPane('generate')
+  setTimeout(() => {
+    privateKeyPair = genKeyPair()
+    hide("generate-progress")
+    render("generate-pubkey", privateKeyPair.pubkey)
+    render("generate-privkey", privateKeyPair.privkey)
+    show("generate-confirm")
+  })
+}
+
+let privateKeyPair = null
+
+function genKeyPair() {
+  var {PrivateKey} = eos_ecc
+  var d = PrivateKey.randomKey()
+  var privkey = d.toWif()
+  var pubkey = d.toPublic().toString()
+  return {pubkey, privkey}
+}
+
+function generateConfirm() {
+  const confirmPriv = getValue("generate-confirm-input")
+  if(confirmPriv !== privateKeyPair.privkey) {
+    show("generate-unmatched")
+    return
+  }
+  hide('generate-pane')
+  show('register-pane')
+}
+
 function register() {
+  const key = privateKeyPair.pubkey
   byId("register-button").classList.add("hidden")
   byId("register-progress").classList.remove("hidden")
-  var key = getValue("register-input")
   eos_sale.register(web3.fromAscii(key), {
     gas: 1000000,
   }, hopefully(result => ping(result).then(() => {
