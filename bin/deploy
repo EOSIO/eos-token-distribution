@@ -4,20 +4,20 @@ set -e
 export DAPP_NO_SAVE=1
 export ETH_GAS=4000000
 
-eos=$(set -x; dapp create DSToken \
+token=$(set -x; dapp create DSToken \
   $(seth --to-bytes32 $(seth --from-ascii EOS))
 )
 
 sale=$(set -x; dapp create EOSSale 7 \
   $(seth --to-uint256 $(seth --to-wei 1000000000 eth)) \
-  $(date +%s -d '3 seconds') \
-  $(date +%s -d '3 hours') \
+  $(date +%s -d '1 second') \
+  $(date +%s -d '1 hour') \
   $(seth --to-uint256 $(seth --to-wei 100000000 eth)) \
   $(seth --from-ascii abcdefghijklmnopqrstuvwxyzABCDEFG)
 )
 
-(set -x; seth send "$eos" "setOwner(address)" "$sale")
-(set -x; seth send "$sale" "initialize(address)" "$eos")
+(set -x; seth send "$token" "setOwner(address)" "$sale")
+(set -x; seth send "$sale" "initialize(address)" "$token")
 
-echo "eos=$eos"
-echo "sale=$sale"
+echo "eos_token=$token"
+echo "eos_sale=$sale"
