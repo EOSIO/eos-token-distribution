@@ -517,8 +517,8 @@ function generate() {
   setTimeout(() => {
     privateKeyPair = genKeyPair()
     hide("generate-progress")
-    render("generate-pubkey", privateKeyPair.pubkey)
-    render("generate-privkey", privateKeyPair.privkey)
+    byId("generate-pubkey").innerHTML = privateKeyPair.pubkey
+    byId("generate-privkey").innerHTML = privateKeyPair.privkey
     show("generate-confirm")
   })
 }
