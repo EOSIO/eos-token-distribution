@@ -5,11 +5,10 @@ pragma solidity ^0.4.11;
 import 'ds-auth/auth.sol';
 import 'ds-exec/exec.sol';
 import 'ds-math/math.sol';
-import 'ds-note/note.sol';
 
 import 'ds-token/token.sol';
 
-contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
+contract EOSSale is DSAuth, DSExec, DSMath {
     DSToken                     public EOS;  
     uint                        public startTime;
     uint                        public numberOfDays;
@@ -113,7 +112,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     // this method provides the buyer some protections regarding which day the buy 
     // order is submitted and the maximum price prior to applying this payment that will
     // be allowed.
-    function buyWithLimit( uint timestamp, uint limit ) initialized note payable {
+    function buyWithLimit( uint timestamp, uint limit ) initialized payable {
         assert( time() > openTime  );
         assert( 0.01 ether <= msg.value && msg.value <= 1000 ether ); // min / max 
         assert( today() <= numberOfDays ); // prevent funds after last day
@@ -129,13 +128,13 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     }
 
     // buys at the current time with no limit
-    function buy() initialized note payable {
+    function buy() initialized payable {
        buyWithLimit( time(), 0 );
     }
 
     // This will have small rounding errors, but the token is going to be
     // truncated to 8 or less decimal places anyway when it is launched on own chain.
-    function claim(uint day, address who) initialized note {
+    function claim(uint day, address who) initialized {
         assert( today() > day );
         if (claimed[day][who]) return;
         var dailyTotal = cast(dailyTotals[day]); // eth-style fixed-point 
@@ -150,7 +149,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
         LogClaim(day, who, reward);
     }
 
-    function claimAll(address who) initialized note {
+    function claimAll(address who) initialized {
         for (uint i = 0; i < today(); i++) {
             claim(i, who);
         }
@@ -160,7 +159,7 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     // policy. Manually registering requires a 33 byte public key
     // base58 encoded using the STEEM, BTS, or EOS public key format
     mapping(address=>string)   public keys;
-    function register(string key) initialized note {
+    function register(string key) initialized {
         assert( today() <=  numberOfDays + 1 );
         assert(bytes(key).length <= 64);
         keys[msg.sender] = key;
@@ -168,14 +167,14 @@ contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     }
 
     // Crowdsale owners can collect any time
-    function collect() note auth {
+    function collect() auth {
         assert( today() > 0 ); // provably prevent any possible recycling during day 0
         exec(msg.sender, this.balance);
         LogCollect(this.balance);
     }
 
     // Anyone can `stop` the token 1 day after the sale ends.
-    function freeze() note {
+    function freeze() {
         assert( today() > numberOfDays + 1 );
         EOS.stop();
     }
