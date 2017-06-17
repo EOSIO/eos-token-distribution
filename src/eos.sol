@@ -2,83 +2,81 @@
 
 pragma solidity ^0.4.11;
 
-import 'ds-auth/auth.sol';
-import 'ds-exec/exec.sol';
-import 'ds-math/math.sol';
+import "ds-auth/auth.sol";
+import "ds-exec/exec.sol";
+import "ds-math/math.sol";
 
-import 'ds-token/token.sol';
+import "ds-token/token.sol";
 
 contract EOSSale is DSAuth, DSExec, DSMath {
-    DSToken                     public EOS;  
-    uint                        public startTime;
-    uint                        public numberOfDays;
-    uint128                     public foundersAllocation;
-    string                      public foundersKey;
-    uint                        public createPerDay;
-    uint                        public createFirstDay;
-    uint                        public openTime;
-    uint128                     public totalSupply;
+    DSToken  public  EOS;                  // The EOS token itself
+    uint128  public  totalSupply;          // Total EOS amount created
+    uint128  public  foundersAllocation;   // Amount given to founders
+    string   public  foundersKey;          // Public key of founders
 
-    mapping(uint=>uint)         public dailyTotals;
-    mapping(uint=>
-        mapping(address=>uint)) public userBuys;
-    mapping(uint=>
-        mapping(address=>bool)) public claimed;
+    uint     public  openTime;             // Time of window 0 opening
+    uint     public  createFirstDay;       // Tokens sold in window 0
 
+    uint     public  startTime;            // Time of window 1 opening
+    uint     public  numberOfDays;         // Number of windows after 0
+    uint     public  createPerDay;         // Tokens sold in each window
 
-    event LogBuy(uint day, address who, uint wad);
-    event LogClaim(uint day, address who, uint wad);
-    event LogCollect(uint wad);
-    event LogRegister(address who, string key);
+    mapping (uint => uint)                       public  dailyTotals;
+    mapping (uint => mapping (address => uint))  public  userBuys;
+    mapping (uint => mapping (address => bool))  public  claimed;
+    mapping (address => string)                  public  keys;
 
-    
-    // @param openTime_      - the first time at which payments will be accepted
-    // @param startTime      - the end of initial window and start of the first 23 hour window
-    // @param numberOfDays_  - the total number of 23 hour periods after the initial window
-    // @param totalSupply_   - the total number of tokens to be allocated by this contract
-    // @param foundersAlloc_ - the number of tokens reserved for founders and not distributed by sale
-    // @param foundersKey    - the EOS key that will control the founders allocation in genesis block
-    function EOSSale(uint numberOfDays_, uint128 totalSupply_, uint openTime_, uint startTime_, uint128 foundersAlloc_, string foundersKey_) {
-        assert( totalSupply_ > foundersAlloc_ );
-        assert( openTime_ < startTime_ );
-        assert( numberOfDays_ > 0 );
+    event LogBuy      (uint window, address user, uint amount);
+    event LogClaim    (uint window, address user, uint amount);
+    event LogRegister (address user, string key);
+    event LogCollect  (uint amount);
+    event LogFreeze   ();
 
-        numberOfDays       = numberOfDays_;
-        totalSupply        = totalSupply_;
-        openTime           = openTime_;
-        startTime          = startTime_;
-        foundersAllocation = foundersAlloc_;
-        foundersKey        = foundersKey_;
+    // XXX: Rename "day" -> "window"?
+
+    function EOSSale(
+        uint     _numberOfDays,
+        uint128  _totalSupply,
+        uint     _openTime,
+        uint     _startTime,
+        uint128  _foundersAllocation,
+        string   _foundersKey
+    ) {
+        numberOfDays       = _numberOfDays;
+        totalSupply        = _totalSupply;
+        openTime           = _openTime;
+        startTime          = _startTime;
+        foundersAllocation = _foundersAllocation;
+        foundersKey        = _foundersKey;
+
+        // XXX: Turn the 20% value into a parameter?
+        createFirstDay = wmul(totalSupply, 0.2 ether);
+        createPerDay = div(
+            sub(sub(totalSupply, foundersAllocation), createFirstDay),
+            numberOfDays
+        );
+
+        assert(numberOfDays > 0);
+        assert(totalSupply > foundersAllocation);
+        assert(openTime < startTime);
     }
 
     function initialize(DSToken eos) auth {
         assert(address(EOS) == address(0));
-
-        // guarantee that this contract is the sole owner of the DSToken
         assert(eos.owner() == address(this));
         assert(eos.authority() == DSAuthority(0));
+        assert(eos.totalSupply() == 0);
 
         EOS = eos;
         EOS.mint(totalSupply);
 
-        // transfer foundersAllocation of EOS ERC-20 tokens to founders address and map to founders public key
-        // founders ETH address '0xb1' is a provably non-transferrable address
-        address founders = 0xb1; 
-        EOS.push(founders, foundersAllocation);
-        keys[founders] = foundersKey;
-        LogRegister(founders, foundersKey);
-
-        createFirstDay     = wmul(totalSupply, 0.2 ether);
-        createPerDay       = div(sub(sub(totalSupply, foundersAllocation), createFirstDay), numberOfDays);
+        // Address 0xb1 is provably non-transferrable
+        EOS.push(0xb1, foundersAllocation);
+        keys[0xb1] = foundersKey;
+        LogRegister(0xb1, foundersKey);
     }
 
-    modifier initialized() {
-        assert(address(EOS) != address(0));
-        _;
-    }
-
-    // overrideable for easy solidity tests
-    function time() constant internal returns (uint) {
+    function time() constant returns (uint) {
         return block.timestamp;
     }
 
@@ -86,96 +84,103 @@ contract EOSSale is DSAuth, DSExec, DSMath {
         return dayFor(time());
     }
 
-    // each day is 23 hours long so that end-of-window rotates around the
-    // clock for all timezones.
+    // Each window is 23 hours long so that end-of-window rotates
+    // around the clock for all timezones.
     function dayFor(uint timestamp) constant returns (uint) {
-        if( timestamp < startTime ) return 0;
-        return (sub(timestamp, startTime) / (23 hours)) + 1;
+        return timestamp < startTime
+            ? 0
+            : sub(timestamp, startTime) / 23 hours + 1;
     }
 
-    // allocate 20% of tokens on the first day which starts at the time the 
-    // contract is published and ends 23 hours after startTime 
-    // allocate the remaining 80% in equal ammounts over the numberOfDays
     function createOnDay(uint day) constant returns (uint) {
-        if( day == 0 ) {
-            return createFirstDay;
-        }
-        return createPerDay;
+        return day == 0 ? createFirstDay : createPerDay;
     }
 
-    // the default action upon receiving funds is disabled to mitigate people from sending
-    // from accounts they do not control
-    function() payable {
+    // This method provides the buyer some protections regarding which
+    // day the buy order is submitted and the maximum price prior to
+    // applying this payment that will be allowed.
+    //
+    // XXX: Change timestamp -> day
+    function buyWithLimit(uint timestamp, uint limit) payable {
+        assert(time() >= openTime && today() <= numberOfDays);
+        assert(0.01 ether <= msg.value && msg.value <= 1000 ether);
+
+        var day = dayFor(timestamp);
+
+        assert(day >= today());
+        assert(day <= numberOfDays);
+
+        userBuys[day][msg.sender] += msg.value;
+        dailyTotals[day] += msg.value;
+
+        if (limit != 0) {
+            assert(dailyTotals[day] <= limit);
+        }
+
+        LogBuy(day, msg.sender, msg.value);
+    }
+
+    function buy() payable {
+       buyWithLimit(time(), 0);
+    }
+
+    function () payable {
        buy();
     }
 
-    // this method provides the buyer some protections regarding which day the buy 
-    // order is submitted and the maximum price prior to applying this payment that will
-    // be allowed.
-    function buyWithLimit( uint timestamp, uint limit ) initialized payable {
-        assert( time() > openTime  );
-        assert( 0.01 ether <= msg.value && msg.value <= 1000 ether ); // min / max 
-        assert( today() <= numberOfDays ); // prevent funds after last day
-        assert( dayFor(timestamp) >= today() ); // allow people to pre-fund future days
-        assert( dayFor(timestamp) <= numberOfDays ); // prevent people from prefunding past the end
+    // XXX: Use msg.sender instead here?
+    function claim(uint day, address user) {
+        assert(today() > day);
 
-        if( limit != 0 ) assert( dailyTotals[dayFor(timestamp)] + msg.value < limit );
+        if (claimed[day][user] || dailyTotals[day] == 0) {
+            return;
+        }
 
-        userBuys[dayFor(timestamp)][msg.sender] += msg.value;
-        dailyTotals[dayFor(timestamp)] += msg.value;
+        // This will have small rounding errors, but the token is
+        // going to be truncated to 8 decimal places or less anyway
+        // when launched on its own chain.
 
-        LogBuy(dayFor(timestamp), msg.sender, msg.value);
+        var dailyTotal = cast(dailyTotals[day]);
+        var userTotal  = cast(userBuys[day][user]);
+        var price      = wdiv(cast(createOnDay(day)), dailyTotal);
+        var reward     = wmul(price, userTotal);
+
+        claimed[day][user] = true;
+        EOS.push(user, reward);
+
+        LogClaim(day, user, reward);
     }
 
-    // buys at the current time with no limit
-    function buy() initialized payable {
-       buyWithLimit( time(), 0 );
-    }
-
-    // This will have small rounding errors, but the token is going to be
-    // truncated to 8 or less decimal places anyway when it is launched on own chain.
-    function claim(uint day, address who) initialized {
-        assert( today() > day );
-        if (claimed[day][who]) return;
-        var dailyTotal = cast(dailyTotals[day]); // eth-style fixed-point 
-        var userTotal = cast(userBuys[day][who]);
-
-        if (dailyTotal == 0) return; // ignore 0 contribution days
-        
-        var price = wdiv(cast(createOnDay(day)), dailyTotal);
-        var reward = wmul(price, userTotal);
-        claimed[day][who] = true;
-        EOS.push(who, reward);
-        LogClaim(day, who, reward);
-    }
-
-    function claimAll(address who) initialized {
+    // XXX: Use msg.sender instead here?
+    function claimAll(address who) {
         for (uint i = 0; i < today(); i++) {
             claim(i, who);
         }
     }
 
-    // The value can be a public key. Read full key import
-    // policy. Manually registering requires a 33 byte public key
-    // base58 encoded using the STEEM, BTS, or EOS public key format
-    mapping(address=>string)   public keys;
-    function register(string key) initialized {
-        assert( today() <=  numberOfDays + 1 );
+    // Value should be a public key.  Read full key import policy.
+    // Manually registering requires a 33 byte public key base58
+    // encoded using the STEEM, BTS, or EOS public key format.
+    function register(string key) {
+        assert(today() <=  numberOfDays + 1);
         assert(bytes(key).length <= 64);
+
         keys[msg.sender] = key;
+
         LogRegister(msg.sender, key);
     }
 
-    // Crowdsale owners can collect any time
+    // Crowdsale owners can collect ETH any number of times
     function collect() auth {
-        assert( today() > 0 ); // provably prevent any possible recycling during day 0
+        assert(today() > 0); // Prevent recycling during window 0
         exec(msg.sender, this.balance);
         LogCollect(this.balance);
     }
 
-    // Anyone can `stop` the token 1 day after the sale ends.
+    // Anyone can freeze the token 1 day after the sale ends
     function freeze() {
-        assert( today() > numberOfDays + 1 );
+        assert(today() > numberOfDays + 1);
         EOS.stop();
+        LogFreeze();
     }
 }

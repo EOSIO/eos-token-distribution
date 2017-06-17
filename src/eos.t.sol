@@ -1,13 +1,12 @@
 pragma solidity ^0.4.11;
 
-import "ds-test/test.sol";
 import "ds-guard/guard.sol";
+import "ds-test/test.sol";
 import 'ds-exec/exec.sol';
 
 import "./eos.sol";
 
 contract TestUser is DSExec {
-
     TestableEOSSale sale;
 
     function TestUser(TestableEOSSale sale_) {
@@ -31,11 +30,9 @@ contract TestUser is DSExec {
     function doExec(uint wad) {
         exec(sale, wad);
     }
-
 }
 
 contract TestOwner {
-
     TestableEOSSale sale;
 
     function TestOwner(TestableEOSSale sale_) {
@@ -47,45 +44,43 @@ contract TestOwner {
     function doCollect() {
         sale.collect();
     }
-
-
 }
 
 contract TestableEOSSale is EOSSale {
-
-    function TestableEOSSale( uint n, uint128 t, uint o, uint s, uint128 a, string k )
-             EOSSale(n, t, o, s, a, k) {}
+    function TestableEOSSale(
+        uint n, uint128 t, uint o, uint s, uint128 a, string k
+    ) EOSSale(n, t, o, s, a, k) {}
 
     uint public localTime;
 
-    function time() constant internal returns (uint) {
+    function time() constant returns (uint) {
         return localTime;
     }
 
     function addTime(uint extra) {
         localTime += extra;
     }
-
 }
 
 contract EOSSaleTest is DSTest, DSExec {
-
-    TestableEOSSale sale;
-    DSToken EOS;
-
-    DSGuard guard;
-
-    TestUser user1;
-    TestUser user2;
-    TestOwner owner;
-
-    uint window = 0;
+    TestableEOSSale  sale;
+    DSToken          EOS;
+    DSGuard          guard;
+    TestUser         user1;
+    TestUser         user2;
+    TestOwner        owner;
+    uint             window;
 
     function setUp() {
         string memory x = new string(1);
 
         EOS = new DSToken("EOS");
-        sale = new TestableEOSSale(5, 156.25 ether, now, block.timestamp + 1 days, 10 ether, x);
+        window = 0;
+
+        sale = new TestableEOSSale(
+            5, 156.25 ether, now, block.timestamp + 1 days, 10 ether, x
+        );
+
         EOS.setOwner(sale);
         sale.initialize(EOS);
 
@@ -109,7 +104,6 @@ contract EOSSaleTest is DSTest, DSExec {
     }
 
     function nextRound(uint wad, uint wad1, uint wad2) {
-
         if (wad != 0) sale.buy.value(wad)();
         if (wad1 != 0) user1.doBuy(wad1);
         if (wad2 != 0) user2.doBuy(wad2);
@@ -125,7 +119,9 @@ contract EOSSaleTest is DSTest, DSExec {
 
     function testFailBuyBeforeOpen() {
         string memory x = new string(1);
-        sale = new TestableEOSSale(5, 156.25 ether, now + 1, block.timestamp + 1 days, 10 ether, x);
+        sale = new TestableEOSSale(
+            5, 156.25 ether, now + 1, block.timestamp + 1 days, 10 ether, x
+        );
         sale.addTime(now);
         sale.buy.value(1 ether)();
     }
@@ -380,57 +376,26 @@ contract EOSSaleTest is DSTest, DSExec {
 }
 
 contract EOSSalePreInitTests is DSTest {
-
-    TestableEOSSale sale;
-    TestUser user1;
+    TestableEOSSale  sale;
+    TestUser         user1;
 
     function setUp() {
         string memory x = new string(1);
 
-        sale = new TestableEOSSale(5, 156.25 ether, now, block.timestamp + 1 days, 10 ether, x);
+        sale = new TestableEOSSale(
+            5, 156.25 ether, now, block.timestamp + 1 days, 10 ether, x
+        );
 
         user1 = new TestUser(sale);
-
         user1.transfer(100 ether);
         sale.addTime(now + 1);
-    }
-
-    // Ensure that client facing methods fail before initialize is called
-    function testFailBuy() {
-        user1.doBuy(1 ether);
-    }
-
-    function testFailBuyWithLimit() {
-        user1.doBuyWithLimit(1 ether, now + 1 days, 2 ether);
-    }
-
-    function testFailClaim() {
-        sale.addTime(1 days);
-        sale.claim(0, user1);
-    }
-
-    function testFailClaimAll() {
-        sale.addTime(6 days);
-        sale.claimAll(user1);
-    }
-
-    function testFailRegister() {
-        string memory x = new string(56);
-        sale.register(x);
     }
 
     // Ensure that initialize fails if the token has other authorized callers
     function testFailTokenAuthority() {
         DSToken EOS = new DSToken("EOS");
-
-        // authorize another user to manipulate the token
-        DSGuard guard = new DSGuard();
-        guard.okay(user1, sale);
-        EOS.setAuthority(guard);
-
-        // hand tainted token to sale
+        EOS.setAuthority(new DSGuard());
         EOS.setOwner(sale);
-
         sale.initialize(EOS);
     }
 }
