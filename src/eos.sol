@@ -103,7 +103,7 @@ contract EOSSale is DSAuth, DSExec, DSMath {
     // XXX: Change timestamp -> day
     function buyWithLimit(uint timestamp, uint limit) payable {
         assert(time() >= openTime && today() <= numberOfDays);
-        assert(0.01 ether <= msg.value && msg.value <= 1000 ether);
+        assert(msg.value >= 0.01 ether);
 
         var day = dayFor(timestamp);
 
