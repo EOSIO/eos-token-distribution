@@ -32,8 +32,6 @@ contract EOSSale is DSAuth, DSExec, DSMath {
     event LogCollect  (uint amount);
     event LogFreeze   ();
 
-    // XXX: Rename "day" -> "window"?
-
     function EOSSale(
         uint     _numberOfDays,
         uint128  _totalSupply,
@@ -49,7 +47,6 @@ contract EOSSale is DSAuth, DSExec, DSMath {
         foundersAllocation = _foundersAllocation;
         foundersKey        = _foundersKey;
 
-        // XXX: Turn the 20% value into a parameter?
         createFirstDay = wmul(totalSupply, 0.2 ether);
         createPerDay = div(
             sub(sub(totalSupply, foundersAllocation), createFirstDay),
@@ -124,11 +121,10 @@ contract EOSSale is DSAuth, DSExec, DSMath {
        buy();
     }
 
-    // XXX: Use msg.sender instead here?
-    function claim(uint day, address user) {
+    function claim(uint day) {
         assert(today() > day);
 
-        if (claimed[day][user] || dailyTotals[day] == 0) {
+        if (claimed[day][msg.sender] || dailyTotals[day] == 0) {
             return;
         }
 
@@ -137,20 +133,19 @@ contract EOSSale is DSAuth, DSExec, DSMath {
         // when launched on its own chain.
 
         var dailyTotal = cast(dailyTotals[day]);
-        var userTotal  = cast(userBuys[day][user]);
+        var userTotal  = cast(userBuys[day][msg.sender]);
         var price      = wdiv(cast(createOnDay(day)), dailyTotal);
         var reward     = wmul(price, userTotal);
 
-        claimed[day][user] = true;
-        EOS.push(user, reward);
+        claimed[day][msg.sender] = true;
+        EOS.push(msg.sender, reward);
 
-        LogClaim(day, user, reward);
+        LogClaim(day, msg.sender, reward);
     }
 
-    // XXX: Use msg.sender instead here?
-    function claimAll(address who) {
+    function claimAll() {
         for (uint i = 0; i < today(); i++) {
-            claim(i, who);
+            claim(i);
         }
     }
 

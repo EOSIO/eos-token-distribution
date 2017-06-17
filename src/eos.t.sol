@@ -23,6 +23,10 @@ contract TestUser is DSExec {
         sale.buyWithLimit.value(wad)(window, limit);
     }
 
+    function doClaim(uint window) {
+        sale.claim(window);
+    }
+
     function doFreeze() {
         sale.freeze();
     }
@@ -110,9 +114,9 @@ contract EOSSaleTest is DSTest, DSExec {
 
         addTime();
 
-        sale.claim(window, this);
-        sale.claim(window, user1);
-        sale.claim(window, user2);
+        sale.claim(window);
+        user1.doClaim(window);
+        user2.doClaim(window);
 
         window++;
     }
@@ -161,19 +165,19 @@ contract EOSSaleTest is DSTest, DSExec {
     function testBuyFirstDay() {
         sale.buy.value(1 ether)();
         sale.addTime(1 days);
-        sale.claim(0, this);
+        sale.claim(0);
         assertEq(EOS.balanceOf(this), 31.25 ether);
     }
 
     function testBuyFirstAndSecondDay() {
         sale.buy.value(1 ether)();
         sale.addTime(1 days);
-        sale.claim(0, this);
+        sale.claim(0);
         assertEq(EOS.balanceOf(this), 31.25 ether);
 
         sale.buy.value(1 ether)();
         sale.addTime(1 days);
-        sale.claim(1, this);
+        sale.claim(1);
         // 23 tokens issued per day after first day
         assertEq(EOS.balanceOf(this), 54.25 ether);
     }
@@ -212,7 +216,7 @@ contract EOSSaleTest is DSTest, DSExec {
     }
 
     function testFailEarlyClaim() {
-        sale.claim(2, this);
+        sale.claim(2);
     }
 
     function testFailEarlyFreeze() {
@@ -327,7 +331,7 @@ contract EOSSaleTest is DSTest, DSExec {
 
         assertEq(EOS.balanceOf(this), 0);
 
-        sale.claim(0, this);
+        sale.claim(0);
 
         assertEq(EOS.balanceOf(this), 31.25 ether);
     }
@@ -342,7 +346,7 @@ contract EOSSaleTest is DSTest, DSExec {
 
         assertEq(EOS.balanceOf(this), 0);
 
-        sale.claimAll(this);
+        sale.claimAll();
         assertEq(EOS.balanceOf(this), 77.25 ether);
     }
 
@@ -357,7 +361,7 @@ contract EOSSaleTest is DSTest, DSExec {
 
         assertEq(EOS.balanceOf(this), 0);
 
-        sale.claimAll(this);
+        sale.claimAll();
         assertEq(EOS.balanceOf(this), 77.25 ether);
     }
 

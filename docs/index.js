@@ -483,7 +483,7 @@ function buy() {
 function claim() {
   byId("claim-button").classList.add("hidden")
   byId("claim-progress").classList.remove("hidden")
-  eos_sale.claimAll(web3.eth.accounts[0], {
+  eos_sale.claimAll({
     gas: 2000000,
   }, hopefully(result => ping(result).then(() => {
     byId("claim-button").classList.remove("hidden")
