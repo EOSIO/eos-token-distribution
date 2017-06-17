@@ -187,7 +187,7 @@ contract EOSSaleTest is DSTest, DSExec {
         nextRound(1 finney, 0, 0);
     }
 
-    function testFailLargeBuy() {
+    function testLargeBuy() {
         nextRound(1001 ether, 0, 0);
     }
 
