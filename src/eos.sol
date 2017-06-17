@@ -1,14 +1,13 @@
 // (C) block.one all rights reserved
 
-pragma solidity ^0.4.10;
+pragma solidity ^0.4.11;
 
 import 'ds-auth/auth.sol';
+import 'ds-exec/exec.sol';
 import 'ds-math/math.sol';
 import 'ds-note/note.sol';
-import 'ds-token/token.sol';
-import 'ds-exec/exec.sol';
-import 'gnosis-multisig/MultiSigWallet.sol';
 
+import 'ds-token/token.sol';
 
 contract EOSSale is DSAuth, DSExec, DSMath, DSNote {
     DSToken                     public EOS;  

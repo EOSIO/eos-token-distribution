@@ -1,8 +1,9 @@
-pragma solidity ^0.4.8;
+pragma solidity ^0.4.11;
 
 import "ds-test/test.sol";
 import "ds-guard/guard.sol";
 import 'ds-exec/exec.sol';
+
 import "./eos.sol";
 
 contract TestUser is DSExec {
