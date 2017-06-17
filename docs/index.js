@@ -55,7 +55,7 @@ function hidePanes() {
 
 onload = () => setTimeout(() => {
   if (!window.web3) {
-    render("app", `
+    byId("app").innerHTML = `
       <div>
         <div class="pane before-error">
           <h2>Could not connect to Ethereum</h2>
@@ -71,10 +71,10 @@ onload = () => setTimeout(() => {
 
           </p>
 
-          <p>Please reload this page and try again. </p>
+          <p>Please reload this page and try again.</p>
         </div>
       </div>
-    `)
+    `
   } else {
     eos_sale  = web3.eth.contract(eos_sale_abi).at(eos_sale_address_kovan)
     eos_token = web3.eth.contract(eos_token_abi).at(eos_token_address_kovan)
@@ -158,7 +158,8 @@ function refresh() {
 }
 
 function render({
-  time, days, unclaimed, today, eth_balance, eos_balance, publicKey, buyWindow,
+  time, days, unclaimed, today,
+  eth_balance, eos_balance, publicKey, buyWindow,
 }) {
   return <div>
             <p style={{ width: "80%" }}>
@@ -575,6 +576,6 @@ function poll() {
 }
 
 function update(x) {
-  state = { ...state, ...x }
-  react("app", render(state))
+  state = Object.assign({}, state, x)
+  ReactDOM.render(render(state), byId("app"))
 }
