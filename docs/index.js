@@ -467,10 +467,9 @@ function render({
 function buy() {
   byId("buy-button").classList.add("hidden")
   byId("buy-progress").classList.remove("hidden")
-  var wad = getValue("buy-input").replace(/,/g, "")
-  var timestamp = Math.round(state.days[state.buyWindow].ends.unix()) - 3600
-  eos_sale.buyWithLimit(timestamp, 0, {
-    value: web3.toWei(wad)
+  var amount = getValue("buy-input").replace(/,/g, "")
+  eos_sale.buyWithLimit(state.buyWindow, 0, {
+    value: web3.toWei(amount)
   }, hopefully(result =>
     ping(result).then(() => {
       hidePanes()

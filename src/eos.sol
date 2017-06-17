@@ -99,13 +99,9 @@ contract EOSSale is DSAuth, DSExec, DSMath {
     // This method provides the buyer some protections regarding which
     // day the buy order is submitted and the maximum price prior to
     // applying this payment that will be allowed.
-    //
-    // XXX: Change timestamp -> day
-    function buyWithLimit(uint timestamp, uint limit) payable {
+    function buyWithLimit(uint day, uint limit) payable {
         assert(time() >= openTime && today() <= numberOfDays);
         assert(msg.value >= 0.01 ether);
-
-        var day = dayFor(timestamp);
 
         assert(day >= today());
         assert(day <= numberOfDays);
@@ -121,7 +117,7 @@ contract EOSSale is DSAuth, DSExec, DSMath {
     }
 
     function buy() payable {
-       buyWithLimit(time(), 0);
+       buyWithLimit(today(), 0);
     }
 
     function () payable {

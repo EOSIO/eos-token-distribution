@@ -19,8 +19,8 @@ contract TestUser is DSExec {
         sale.buy.value(wad)();
     }
 
-    function doBuyWithLimit(uint wad, uint timestamp, uint limit) {
-        sale.buyWithLimit.value(wad)(timestamp, limit);
+    function doBuyWithLimit(uint wad, uint window, uint limit) {
+        sale.buyWithLimit.value(wad)(window, limit);
     }
 
     function doFreeze() {
@@ -131,22 +131,22 @@ contract EOSSaleTest is DSTest, DSExec {
     }
 
     function testBuyWithLimit() {
-        sale.buyWithLimit.value(1 ether)(now, 2 ether);
+        sale.buyWithLimit.value(1 ether)(0, 2 ether);
         assertEq(sale.userBuys(0, address(this)), 1 ether);
     }
 
     function testFailBuyOverLimit() {
         user1.doBuy(1 ether);
-        sale.buyWithLimit.value(1 ether)(now, 1.5 ether);
+        sale.buyWithLimit.value(1 ether)(0, 1.5 ether);
     }
 
     function testBuyOverLimitLaterWindow() {
         user1.doBuy(1 ether);
-        sale.buyWithLimit.value(1 ether)(now + 24 hours * 3, 1.5 ether);
+        sale.buyWithLimit.value(1 ether)(3, 1.5 ether);
     }
 
     function testBuyLaterWindow() {
-        sale.buyWithLimit.value(1 ether)(now + 24 hours * 3, 2 ether);
+        sale.buyWithLimit.value(1 ether)(3, 2 ether);
         assertEq(sale.userBuys(0, address(this)), 0);
         assertEq(sale.userBuys(2, address(this)), 0);
         assertEq(sale.userBuys(3, address(this)), 1 ether);
@@ -155,7 +155,7 @@ contract EOSSaleTest is DSTest, DSExec {
 
     function testFailBuyTooLate() {
         addTime();
-        sale.buyWithLimit.value(1 ether)(now, 0);
+        sale.buyWithLimit.value(1 ether)(0, 0);
     }
 
     function testBuyFirstDay() {
