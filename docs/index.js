@@ -332,7 +332,7 @@ function render({
                     </td>
                   </tr>
                   <tr>
-                    <th>Closes</th>
+                    <th>Closing</th>
                     <td style={{ textAlign: "left" }}>
                       {days[buyWindow].ends.fromNow()}
                     </td>
@@ -419,7 +419,7 @@ function render({
                       <th>EOS for sale</th>
                       <th>Total ETH</th>
                       <th>Effective price</th>
-                      <th>Closes</th>
+                      <th>Closing</th>
                       <th>Your ETH</th>
                       <th>Your EOS</th>
                     </tr>
