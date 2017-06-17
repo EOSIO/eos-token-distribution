@@ -467,9 +467,8 @@ function render({
 function buy() {
   byId("buy-button").classList.add("hidden")
   byId("buy-progress").classList.remove("hidden")
-  var wad = getValue("buy-input")
+  var wad = getValue("buy-input").replace(/,/g, "")
   var timestamp = Math.round(state.days[state.buyWindow].ends.unix()) - 3600
-  console.log(timestamp)
   eos_sale.buyWithLimit(timestamp, 0, {
     value: web3.toWei(wad)
   }, hopefully(result =>
@@ -497,7 +496,7 @@ function transfer() {
   byId("transfer-button").classList.add("hidden")
   byId("transfer-progress").classList.remove("hidden")
   var guy = getValue("transfer-address-input")
-  var wad = getValue("transfer-amount-input") * WAD
+  var wad = getValue("transfer-amount-input").replace(/,/g, "") * WAD
   eos_token.transfer(guy, wad, hopefully(result => ping(result).then(() => {
     hidePanes()
     byId("transfer-button").classList.remove("hidden")
