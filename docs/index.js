@@ -159,16 +159,21 @@ function render({
   time, days, unclaimed, today,
   eth_balance, eos_balance, publicKey, buyWindow,
 }) {
-
   return <div>
-            <p style={{ width: "80%" }}>
+            <p style={{ width: "90%" }}>
 
-              The EOS Token Sale will distributed daily over about 341
-              days.  1,000,000,000 (one billion) EOS tokens will be minted
-              at the start of the sale.  These tokens will be split into
+              The EOS Token Sale will take place over about 341 days.
+              1,000,000,000 (one billion) EOS tokens will be created
+              at the start of the sale.  10% of these are allocated to
+              the EOS founders.  The other 90% will be split into
               different rolling windows of availability.  The tokens
-              available in a window will be split proportional to all
-              contributions made during the window period.
+              in a given window are split proportionally to all
+              contributions made during that window.  20% of the
+              tokens will be sold in a special first window lasting
+              for about five days.  The remaining 70% will be divided
+              equally into 365 windows, each lasting for 23 hours.
+              While contributions can be made to any future window,
+              the EOS tokens can be claimed only once a window closes.
 
             </p>
 
