@@ -608,7 +608,7 @@ var loaded
 setTimeout(() => loaded || location.reload(), 20000)
 
 function poll() {
-  refresh().then(() => (loaded = true, setTimeout(poll, 3000)))
+  refresh().then(() => (loaded = true, setTimeout(poll, 10000)))
 }
 
 function update(x) {
