@@ -53,7 +53,7 @@ function hidePanes() {
   }
 }
 
-onload = () => setTimeout(() => {
+// onload = () => setTimeout(() => {
   if (!window.web3) {
     byId("app").innerHTML = `
       <div>
@@ -87,7 +87,7 @@ onload = () => setTimeout(() => {
       }
     }))
   }
-}, 500)
+// }, 500)
 
 function refresh() {
   return new Promise((resolve, reject) => {
