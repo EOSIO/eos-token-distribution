@@ -214,7 +214,7 @@ var render = ({
               </span>
               <a href="#" id="generate-link" style={{ float: "right" }}
                  onClick={event => (generate(), event.preventDefault())}>
-                Generate your EOS key
+                Generate EOS key
               </a>
             </span>}
           </td>
@@ -266,18 +266,18 @@ var render = ({
       <div id="generate-confirm" className="hidden">
         <h3>Register EOS key</h3>
 
-        Please back up the private key displayed below in multiple
+        <p>Please back up the private key displayed below in multiple
         safe locations before continuing.  You should make more than
         one copy and keep all copies in separate secure locations.
         If you use an external storage device such as a USB stick,
-        make sure to safely eject the device before continuing.
+        make sure to safely eject the device before continuing.</p>
 
         <table>
           <tbody>
             <tr>
               <th>Description</th>
-              <td style={{textAlign: 'left'}}>
-                EOS Token Sale claim key
+              <td style={{ textAlign: "left" }}>
+                EOS Token Sale Claim Key
               </td>
             </tr>
             <tr>
@@ -293,11 +293,12 @@ var render = ({
               </td>
             </tr>
             <tr>
-              <th>Confirm private key</th>
+              <th style={{ verticalAlign: "top" }}>Confirm private key</th>
               <td style={{ textAlign: "left" }}>
-                <input name="wif" type="password"
-                  id="generate-confirm-input" style={{ width: "30em" }}
-                  autoComplete="off"/>
+                <input name="wif" autoComplete="off"
+                  id="generate-confirm-input"
+                  style={{ width: "30em", fontFamily: "monospace" }}
+                  />
                 <p id="generate-unmatched" className="hidden">
                   <b style={{ color: "red" }}>
                     Private key does not match
@@ -310,9 +311,9 @@ var render = ({
 
         <p>
 
-          <b>Warning:</b> There is <b>no way</b> to recover your
-          private key.  <b>You must save it right now</b> or you will
-          not be able to access your EOS tokens after the sale ends.
+          <b style={{ color: "red" }}>Warning:</b> There is no way to
+          recover your private key.  <b>You must save it right now</b>
+          or you will be unable to access your EOS tokens.
 
         </p>
 
