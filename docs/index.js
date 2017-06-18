@@ -108,9 +108,7 @@ function refresh() {
       }) => {
         var startMoment = moment(Number(startTime) * 1000)
 
-        if (publicKey) {
-          publicKey = web3.toAscii(publicKey)
-        } else {
+        if (!publicKey) {
           publicKey = null
           byId("app").addEventListener("mousemove", entropyEvent, {capture: false, passive: true})
         }
@@ -161,6 +159,7 @@ function render({
   time, days, unclaimed, today,
   eth_balance, eos_balance, publicKey, buyWindow,
 }) {
+
   return <div>
             <p style={{ width: "80%" }}>
 
@@ -579,7 +578,7 @@ function register() {
   const key = privateKeyPair.pubkey
   byId("register-button").classList.add("hidden")
   byId("register-progress").classList.remove("hidden")
-  eos_sale.register(web3.fromAscii(key), {
+  eos_sale.register(key, {
     gas: 1000000,
   }, hopefully(result => ping(result).then(() => {
     hidePanes()
