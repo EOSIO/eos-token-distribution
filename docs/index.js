@@ -442,7 +442,7 @@ function render({
                   </thead>
                   <tbody>
                     {days.map((day, i) =>
-                      <tr key={i} className={i == Number(today) ? "active" : ""}>
+                      <tr key={i} className={i == Number(today) ? "active" : i < Number(today) ? "closed" : ""}>
                         <td>
                           #{day.name}
                           {i == Number(today) ? "" : ""}

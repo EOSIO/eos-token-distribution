@@ -8,6 +8,7 @@ body { overflow-y: scroll; }
 .pane { margin: 1.5rem 0; border-left: none; border-right: none; }
 .pane + .pane { border-top: none; margin-top: 0; padding-top: 0; }
 .active { background: #ffd; font-weight: bold; }
+.closed { color: gray; }
 button, input, select { font: inherit; padding: 0rem .25rem; }
 .hidden { display: none; }
 button { padding-left: 1rem; padding-right: 1rem; }
