@@ -186,8 +186,7 @@ var render = ({
     padding: "1rem 2rem",
     color: "gray"
   }}>
-    <b style={{ marginRight: ".2rem" }}>Last updated: </b>
-    {moment(time * 1000).format("LTS")}
+    Last updated {moment(time * 1000).format("LTS")}
   </span>
 
   {web3.eth.accounts[0] ? <div>
@@ -359,8 +358,11 @@ var render = ({
         <tr>
           <th>Sale window</th>
           <td style={{ textAlign: "left" }}>
-            <select id="sale-window" value={buyWindow} onChange={e => update({ buyWindow: e.target.value })}>
-              {days.map((d, i) => <option key={i} value={i}>Window #{i}</option>)}
+            <select id="sale-window" value={buyWindow}
+                    onChange={e => update({ buyWindow: e.target.value })}>
+              {days.filter((d, i) => i <= Number(today)).map((d, i) => {
+                return <option key={i} value={i}>Window #{i}</option>
+              })}
             </select>
           </td>
         </tr>
