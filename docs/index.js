@@ -108,9 +108,7 @@ function refresh() {
       }) => {
         var startMoment = moment(Number(startTime) * 1000)
 
-        if (publicKey.length > 42) {
-          publicKey = web3.toAscii(publicKey)
-        } else if (publicKey === '') {
+        if (!publicKey) {
           publicKey = null
           byId("app").addEventListener("mousemove", entropyEvent, {capture: false, passive: true})
         }
@@ -161,6 +159,7 @@ function render({
   time, days, unclaimed, today,
   eth_balance, eos_balance, publicKey, buyWindow,
 }) {
+
   return <div>
             <p style={{ width: "80%" }}>
 
@@ -196,8 +195,8 @@ function render({
                     <td style={{ textAlign: "left" }}>
                       {publicKey ? <span>
                         <code>{publicKey}</code>
-                        <a href="#" id="generate-link" style={{ float: "right" }}
-                           onClick={event => (event.preventDefault(), showPane('generate'))}>
+                        <a href="#" id="register-link" style={{ float: "right" }}
+                           onClick={event => (event.preventDefault(), showPane('register'))}>
                           Change your EOS key
                         </a>
                       </span> : <span>
@@ -257,15 +256,29 @@ function render({
                 </span>
                 <div id="generate-confirm" className="hidden">
                   <h3>Generate EOS key</h3>
-                  You must save this "Private key" in a safe location before registering.  Copy
-                  and paste this key into your backup file and if it is a USB, safly eject.  You
-                  should make more than one copy.  Finally, paste the private key into the field
-                  below when you are done and click "Continue" ..
+                  Please save the "<b>Private key</b>" below in a safe location before clicking
+                  "Continue."  It is good to save the description and public key too for your
+                  records.  You should make more than one copy and keep all copies in separate
+                  secure locations.  If you use an external storage like a USB drive, make sure you
+                  safely eject the device so you know the data is written.
 
-                  <p>This section is work-in-proress and may change..</p>
+                  <p>Copy and paste the private key into the field below.  Make your backups.  When you
+                  are done click "Continue" ..</p>
 
                   <table>
                     <tbody>
+                      <tr>
+                        <th>Description</th>
+                        <td style={{textAlign: 'left'}}>
+                          EOS Token Sale Claim Key, created {Date().toString()}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Public key</th>
+                        <td style={{textAlign: 'left'}}>
+                          <span id="generate-pubkey" style={{width: '30em'}}>&nbsp;</span>
+                        </td>
+                      </tr>
                       <tr>
                         <th>Private key</th>
                         <td style={{textAlign: 'left'}}>
@@ -274,7 +287,7 @@ function render({
                       </tr>
                       <tr>
                         <th>Confirm Private Key</th>
-                        <td>
+                        <td style={{textAlign: "left"}}>
                           <input name="wif" type="password"
                             id="generate-confirm-input" style={{width: '30em'}}
                             autoComplete="off"/>
@@ -287,9 +300,12 @@ function render({
                       </tr>
                     </tbody>
                   </table>
+                  <p>There is <b>no</b> way to recover this private key.  You must save it or
+                  your EOS tokens will be delivered to an <b>unclaimable</b> key.</p>
                   <button id="generate-button">
-                    Continue
+                    Continue: I have saved the "Private Key"
                   </button>
+                  <button onClick={generateCancel} style={{ textAlign: "right"}}>Cancel</button>
                 </div>
               </form>
               <form className="hidden pane" id="register-pane"
@@ -514,11 +530,13 @@ function entropyEvent(e) {
 
 function generate() {
   showPane('generate')
+  show("generate-progress")
+  hide("generate-confirm")
   setTimeout(() => {
     privateKeyPair = genKeyPair()
     hide("generate-progress")
-    render("generate-pubkey", privateKeyPair.pubkey)
-    render("generate-privkey", privateKeyPair.privkey)
+    byId("generate-pubkey").innerHTML = privateKeyPair.pubkey
+    byId("generate-privkey").innerHTML = privateKeyPair.privkey
     show("generate-confirm")
   })
 }
@@ -539,15 +557,28 @@ function generateConfirm() {
     show("generate-unmatched")
     return
   }
+  byId("generate-pubkey").innerHTML = null
+  byId("generate-privkey").innerHTML = null
   hide('generate-pane')
   show('register-pane')
+  register()
+}
+
+function generateCancel(e) {
+  e.preventDefault()
+  privateKeyPair = null
+  byId("generate-pubkey").innerHTML = null
+  byId("generate-privkey").innerHTML = null
+  hide('generate-pane')
+  hide('register-pane')
+  show("generate-link")
 }
 
 function register() {
   const key = privateKeyPair.pubkey
   byId("register-button").classList.add("hidden")
   byId("register-progress").classList.remove("hidden")
-  eos_sale.register(web3.fromAscii(key), {
+  eos_sale.register(key, {
     gas: 1000000,
   }, hopefully(result => ping(result).then(() => {
     hidePanes()
