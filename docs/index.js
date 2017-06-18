@@ -311,9 +311,9 @@ var render = ({
 
         <p>
 
-          <b style={{ color: "red" }}>Warning:</b> There is no way to
-          recover your private key.  <b>You must save it right now</b>
-          or you will be unable to access your EOS tokens.
+          There is no way to recover your private key.  You must save
+          it right now or you will be unable to access your EOS tokens
+          when the sale ends.
 
         </p>
 
