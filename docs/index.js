@@ -155,336 +155,336 @@ function refresh() {
   })
 }
 
-function render({
+var render = ({
   time, days, unclaimed, today,
   eth_balance, eos_balance, publicKey, buyWindow,
-}) {
-  return <div>
-            <p style={{ width: "90%" }}>
+}) => <div>
+  <p style={{ width: "90%" }}>
 
-              The EOS Token Sale will take place over about 341 days.
-              1,000,000,000 (one billion) EOS tokens will be created
-              at the start of the sale.  10% of these are allocated to
-              the EOS founders.  The other 90% will be split into
-              different rolling windows of availability.  The tokens
-              in a given window are split proportionally to all
-              contributions made during that window.  20% of the
-              tokens will be sold in a special first window lasting
-              for about five days.  The remaining 70% will be divided
-              equally into 365 windows, each lasting for 23 hours.
-              While contributions can be made to any future window,
-              the EOS tokens can be claimed only once a window closes.
+    The EOS Token Sale will take place over about 341 days.
+    1,000,000,000 (one billion) EOS tokens will be created at the
+    start of the sale.  10% of these will be allocated to the EOS
+    founders.  The other 90% will be split into different rolling
+    windows of availability.  The tokens in a given window will be
+    split proportionally to all contributions made during that window.
+    20% of the tokens will be sold in a special first window, lasting
+    about five days, while the remaining 70% will be divided equally
+    into 365 windows, each lasting 23 hours.  Contributions can be
+    made to any future window, but the EOS tokens allocated to a given
+    window can be claimed only once that window closes.
 
-            </p>
+  </p>
 
-            For more details, please review the token sale <a
-            href="https://github.com/eosio/eos-token-sale">contract source
-            code</a>.
+  For more details, please review the token sale <a
+  href="https://github.com/eosio/eos-token-sale">contract source
+  code</a>.
 
-            <span style={{ position: "absolute", top: "1.5rem", left: "15rem", padding: "1rem 2rem", color: "gray" }}>
-              <b style={{ marginRight: ".2rem" }}>Last updated: </b>
-              {moment(time * 1000).format("LTS")}
+  <span style={{
+    position: "absolute",
+    top: "1.5rem",
+    left: "15rem",
+    padding: "1rem 2rem",
+    color: "gray"
+  }}>
+    <b style={{ marginRight: ".2rem" }}>Last updated: </b>
+    {moment(time * 1000).format("LTS")}
+  </span>
+
+  {web3.eth.accounts[0] ? <div>
+    <div className="pane">
+      <table><tbody>
+        <tr>
+          <th>Ethereum account</th>
+          <td style={{ width: "45rem", textAlign: "left" }}>
+            <code>{web3.eth.accounts[0]}</code>
+          </td>
+        </tr>
+        <tr>
+          <th>EOS public key</th>
+          <td style={{ textAlign: "left" }}>
+            {publicKey ? <span>
+              <code>{publicKey}</code>
+              <a href="#" id="register-link" style={{ float: "right" }}
+                 onClick={event => (event.preventDefault(), showPane('register'))}>
+                Change your EOS key
+              </a>
+            </span> : <span>
+              <span style={{ color: "gray" }}>
+                (no EOS public key registered)
+              </span>
+              <a href="#" id="generate-link" style={{ float: "right" }}
+                 onClick={event => (generate(), event.preventDefault())}>
+                Register your EOS key
+              </a>
+            </span>}
+          </td>
+        </tr>
+        <tr>
+          <th>Token balances</th>
+          <td style={{ textAlign: "left" }}>
+            {formatETH(eth_balance.div(WAD))} ETH
+            <a href="#" id="buy-link"
+               style={{ marginLeft: "1rem", float: "right" }}
+               onClick={event => (event.preventDefault(), showPane('buy'))}>
+              Buy EOS tokens
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <th></th>
+          <td style={{ textAlign: "left" }}>
+            {formatEOS(unclaimed)} EOS (unclaimed)
+            <span style={{ marginLeft: "1rem", float: "right" }}>
+              <button id="claim-button" disabled={unclaimed.equals(0)}
+                      onClick={event => (event.preventDefault(), claim())}>
+                Claim EOS tokens
+              </button>
+              <span id="claim-progress" className="hidden">
+                Claiming tokens...
+              </span>
             </span>
+          </td>
+        </tr>
+        <tr>
+          <th></th>
+          <td style={{ textAlign: "left" }}>
+            {formatEOS(eos_balance.div(WAD))} EOS
+            <a href="#" id="transfer-link"
+               style={{ marginLeft: "1rem", float: "right" }}
+               onClick={event => (event.preventDefault(), showPane('transfer'))}>
+              Transfer EOS tokens
+            </a>
+          </td>
+        </tr>
+      </tbody></table>
+    </div>
+    <form className="hidden pane" id="generate-pane"
+        onSubmit={event => (event.preventDefault(), generateConfirm())}>
+      <span id="generate-progress">
+        Generating key...
+      </span>
+      <div id="generate-confirm" className="hidden">
+        <h3>Generate EOS key</h3>
+        Please save the "<b>Private key</b>" below in a safe location before clicking
+        "Continue."  It is good to save the description and public key too for your
+        records.  You should make more than one copy and keep all copies in separate
+        secure locations.  If you use an external storage like a USB drive, make sure you
+        safely eject the device so you know the data is written.
 
-            {web3.eth.accounts[0] ? <div>
-              <div className="pane">
-                <table><tbody>
-                  <tr>
-                    <th>Ethereum account</th>
-                    <td style={{ width: "45rem", textAlign: "left" }}>
-                      <code>{web3.eth.accounts[0]}</code>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>EOS public key</th>
-                    <td style={{ textAlign: "left" }}>
-                      {publicKey ? <span>
-                        <code>{publicKey}</code>
-                        <a href="#" id="register-link" style={{ float: "right" }}
-                           onClick={event => (event.preventDefault(), showPane('register'))}>
-                          Change your EOS key
-                        </a>
-                      </span> : <span>
-                        <span style={{ color: "gray" }}>
-                          (no EOS public key registered)
-                        </span>
-                        <a href="#" id="generate-link" style={{ float: "right" }}
-                           onClick={event => (generate(), event.preventDefault())}>
-                          Register your EOS key
-                        </a>
-                      </span>}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Token balances</th>
-                    <td style={{ textAlign: "left" }}>
-                      {formatETH(eth_balance.div(WAD))} ETH
-                      <a href="#" id="buy-link"
-                         style={{ marginLeft: "1rem", float: "right" }}
-                         onClick={event => (event.preventDefault(), showPane('buy'))}>
-                        Buy EOS tokens
-                      </a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th></th>
-                    <td style={{ textAlign: "left" }}>
-                      {formatEOS(unclaimed)} EOS (unclaimed)
-                      <span style={{ marginLeft: "1rem", float: "right" }}>
-                        <button id="claim-button" disabled={unclaimed.equals(0)}
-                                onClick={event => (event.preventDefault(), claim())}>
-                          Claim EOS tokens
-                        </button>
-                        <span id="claim-progress" className="hidden">
-                          Claiming tokens...
-                        </span>
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th></th>
-                    <td style={{ textAlign: "left" }}>
-                      {formatEOS(eos_balance.div(WAD))} EOS
-                      <a href="#" id="transfer-link"
-                         style={{ marginLeft: "1rem", float: "right" }}
-                         onClick={event => (event.preventDefault(), showPane('transfer'))}>
-                        Transfer EOS tokens
-                      </a>
-                    </td>
-                  </tr>
-                </tbody></table>
-              </div>
-              <form className="hidden pane" id="generate-pane"
-                  onSubmit={event => (event.preventDefault(), generateConfirm())}>
-                <span id="generate-progress">
-                  Generating key...
-                </span>
-                <div id="generate-confirm" className="hidden">
-                  <h3>Generate EOS key</h3>
-                  Please save the "<b>Private key</b>" below in a safe location before clicking
-                  "Continue."  It is good to save the description and public key too for your
-                  records.  You should make more than one copy and keep all copies in separate
-                  secure locations.  If you use an external storage like a USB drive, make sure you
-                  safely eject the device so you know the data is written.
+        <p>Copy and paste the private key into the field below.  Make your backups.  When you
+        are done click "Continue" ..</p>
 
-                  <p>Copy and paste the private key into the field below.  Make your backups.  When you
-                  are done click "Continue" ..</p>
+        <table>
+          <tbody>
+            <tr>
+              <th>Description</th>
+              <td style={{textAlign: 'left'}}>
+                EOS Token Sale Claim Key, created {Date().toString()}
+              </td>
+            </tr>
+            <tr>
+              <th>Public key</th>
+              <td style={{textAlign: 'left'}}>
+                <span id="generate-pubkey" style={{width: '30em'}}>&nbsp;</span>
+              </td>
+            </tr>
+            <tr>
+              <th>Private key</th>
+              <td style={{textAlign: 'left'}}>
+                <span id="generate-privkey" style={{width: '30em'}}>&nbsp;</span>
+              </td>
+            </tr>
+            <tr>
+              <th>Confirm Private Key</th>
+              <td style={{textAlign: "left"}}>
+                <input name="wif" type="password"
+                  id="generate-confirm-input" style={{width: '30em'}}
+                  autoComplete="off"/>
+                <p id="generate-unmatched" className="hidden">
+                  <span style={{color: 'red'}}>
+                    Please check the confirmed key again, it does not match.
+                  </span>
+                </p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p>There is <b>no</b> way to recover this private key.  You must save it or
+        your EOS tokens will be delivered to an <b>unclaimable</b> key.</p>
+        <button id="generate-button">
+          Continue: I have saved the "Private Key"
+        </button>
+        <button onClick={generateCancel} style={{ textAlign: "right"}}>Cancel</button>
+      </div>
+    </form>
+    <form className="hidden pane" id="register-pane"
+          onSubmit={event => (event.preventDefault(), register())}>
+      <h3>{publicKey ? "Change" : "Register"} EOS public key</h3>
+      <table><tbody>
+        <tr>
+          <th>Public key</th>
+          <td style={{ textAlign: "left" }}>
+            {publicKey ? <span>
+              <input //defaultValue={escape(publicKey)}
+                id="register-input" required
+                minLength={33} maxLength={33}
+                style={{ width: "30em", fontFamily: "monospace" }}/>
+            </span> : <span>
+              <span id="generate-pubkey" style={{width: "30em"}}>&nbsp;</span>
+            </span>}
+            <span style={{ marginLeft: "1rem" }}>
+              <button id="register-button">
+                {publicKey ? "Change" : "Register"} key
+              </button>
+              <span id="register-progress" className="hidden">
+                Registering key...
+              </span>
+            </span>
+          </td>
+        </tr>
+      </tbody></table>
+    </form>
+    <form className="hidden pane" id="buy-pane"
+          onSubmit={event => (event.preventDefault(), buy())}>
+      <h3>Buy EOS tokens</h3>
+      <table><tbody>
+        <tr>
+          <th>Sale window</th>
+          <td style={{ textAlign: "left" }}>
+            <select id="sale-window" value={buyWindow} onChange={e => update({ buyWindow: e.target.value })}>
+              {days.map((d, i) => <option key={i} value={i}>Window #{i}</option>)}
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <th>Closing</th>
+          <td style={{ textAlign: "left" }}>
+            {days[buyWindow].ends.fromNow()}
+          </td>
+        </tr>
+        <tr>
+          <th>EOS for sale</th>
+          <td style={{ textAlign: "left" }}>
+            {formatEOS(days[buyWindow].createOnDay)} EOS
+          </td>
+        </tr>
+        <tr>
+          <th>Total ETH</th>
+          <td style={{ textAlign: "left" }}>
+            {formatETH(days[buyWindow].dailyTotal)} ETH
+          </td>
+        </tr>
+        <tr>
+          <th>Your ETH</th>
+          <td style={{ textAlign: "left" }}>
+            {formatETH(days[buyWindow].userBuys)} ETH
+          </td>
+        </tr>
+        <tr>
+          <th>Effective price</th>
+          <td style={{ textAlign: "left" }}>
+            {days[buyWindow].price.toFormat(9)} ETH/EOS
+          </td>
+        </tr>
+        <tr>
+          <th>Send ETH</th>
+          <td style={{ textAlign: "left" }}>
+            <input type="text" required id="buy-input"
+                   placeholder={formatETH(eth_balance.div(WAD))}/>
+            {" ETH"}
+            <span style={{ marginLeft: "1.5rem" }}>
+              <button id="buy-button">
+                Send ETH
+              </button>
+              <span id="buy-progress" className="hidden">
+                Sending ETH...
+              </span>
+            </span>
+          </td>
+        </tr>
+      </tbody></table>
+    </form>
+    <form className="hidden pane before-error" id="transfer-pane"
+          onSubmit={event => (event.preventDefault(), transfer())}>
+      <h3>Transfer EOS tokens to another Ethereum account</h3>
+      <table><tbody>
+        <tr>
+          <th>Recipient account</th>
+          <td style={{ textAlign: "left" }}>
+            <input placeholder="0x0123456789abcdef0123456789abcdef01234567"
+                   id="transfer-address-input" required
+                   minLength={42} maxLength={42}
+                   style={{ width: "100%" }}/>
+          </td>
+        </tr>
+        <tr>
+          <th>Transfer amount</th>
+          <td style={{ textAlign: "left" }}>
+            <input placeholder={formatEOS(eos_balance.div(WAD))}
+                   id="transfer-amount-input" required
+                   style={{ width: "15em" }}/>
+            {" EOS"}
+            <span style={{ marginLeft: "1rem" }}>
+              <button id="transfer-button">
+                Transfer EOS tokens
+              </button>
+              <span id="transfer-progress" className="hidden">
+                Transferring tokens...
+              </span>
+            </span>
+          </td>
+        </tr>
+      </tbody></table>
+    </form>
+    <div className="pane">
+      <table style={{ width: "100%" }}>
+        <thead>
+          <tr>
+            <th>Window</th>
+            <th>EOS for sale</th>
+            <th>Total ETH</th>
+            <th>Effective price</th>
+            <th>Closing</th>
+            <th>Your ETH</th>
+            <th>Your EOS</th>
+          </tr>
+        </thead>
+        <tbody>
+          {days.map((day, i) =>
+            <tr key={i} className={i == Number(today) ? "active" : i < Number(today) ? "closed" : ""}>
+              <td>
+                #{day.name}
+                {i == Number(today) ? "" : ""}
+              </td>
+              <td>{formatEOS(day.createOnDay)} EOS</td>
+              <td>{formatETH(day.dailyTotal)} ETH</td>
+              <td>{day.dailyTotal == 0 ? "n/a" : (
+                `${day.price.toFormat(9)} ETH/EOS`
+              )}</td>
+              <td>{day.ends.fromNow()}</td>
+              <td>{formatETH(day.userBuys)} ETH</td>
+              <td>
+                {formatEOS(day.received)} EOS
+                {i >= Number(today)
+                  && <span title="Pending EOS subject to change if additional funds received" style={{ cursor: "pointer" }}> *</span>}
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  </div> : <div className="pane before-error">
+    <h3>Ethereum account not found</h3>
 
-                  <table>
-                    <tbody>
-                      <tr>
-                        <th>Description</th>
-                        <td style={{textAlign: 'left'}}>
-                          EOS Token Sale Claim Key, created {Date().toString()}
-                        </td>
-                      </tr>
-                      <tr>
-                        <th>Public key</th>
-                        <td style={{textAlign: 'left'}}>
-                          <span id="generate-pubkey" style={{width: '30em'}}>&nbsp;</span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <th>Private key</th>
-                        <td style={{textAlign: 'left'}}>
-                          <span id="generate-privkey" style={{width: '30em'}}>&nbsp;</span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <th>Confirm Private Key</th>
-                        <td style={{textAlign: "left"}}>
-                          <input name="wif" type="password"
-                            id="generate-confirm-input" style={{width: '30em'}}
-                            autoComplete="off"/>
-                          <p id="generate-unmatched" className="hidden">
-                            <span style={{color: 'red'}}>
-                              Please check the confirmed key again, it does not match.
-                            </span>
-                          </p>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <p>There is <b>no</b> way to recover this private key.  You must save it or
-                  your EOS tokens will be delivered to an <b>unclaimable</b> key.</p>
-                  <button id="generate-button">
-                    Continue: I have saved the "Private Key"
-                  </button>
-                  <button onClick={generateCancel} style={{ textAlign: "right"}}>Cancel</button>
-                </div>
-              </form>
-              <form className="hidden pane" id="register-pane"
-                    onSubmit={event => (event.preventDefault(), register())}>
-                <h3>{publicKey ? "Change" : "Register"} EOS public key</h3>
-                <table><tbody>
-                  <tr>
-                    <th>Public key</th>
-                    <td style={{ textAlign: "left" }}>
-                      {publicKey ? <span>
-                        <input //defaultValue={escape(publicKey)}
-                          id="register-input" required
-                          minLength={33} maxLength={33}
-                          style={{ width: "30em", fontFamily: "monospace" }}/>
-                      </span> : <span>
-                        <span id="generate-pubkey" style={{width: "30em"}}>&nbsp;</span>
-                      </span>}
-                      <span style={{ marginLeft: "1rem" }}>
-                        <button id="register-button">
-                          {publicKey ? "Change" : "Register"} key
-                        </button>
-                        <span id="register-progress" className="hidden">
-                          Registering key...
-                        </span>
-                      </span>
-                    </td>
-                  </tr>
-                </tbody></table>
-              </form>
-              <form className="hidden pane" id="buy-pane"
-                    onSubmit={event => (event.preventDefault(), buy())}>
-                <h3>Buy EOS tokens</h3>
-                <table><tbody>
-                  <tr>
-                    <th>Sale window</th>
-                    <td style={{ textAlign: "left" }}>
-                      <select id="sale-window" value={buyWindow} onChange={e => update({ buyWindow: e.target.value })}>
-                        {days.map((d, i) => <option key={i} value={i}>Window #{i}</option>)}
-                      </select>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Closing</th>
-                    <td style={{ textAlign: "left" }}>
-                      {days[buyWindow].ends.fromNow()}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>EOS for sale</th>
-                    <td style={{ textAlign: "left" }}>
-                      {formatEOS(days[buyWindow].createOnDay)} EOS
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Total ETH</th>
-                    <td style={{ textAlign: "left" }}>
-                      {formatETH(days[buyWindow].dailyTotal)} ETH
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Your ETH</th>
-                    <td style={{ textAlign: "left" }}>
-                      {formatETH(days[buyWindow].userBuys)} ETH
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Effective price</th>
-                    <td style={{ textAlign: "left" }}>
-                      {days[buyWindow].price.toFormat(9)} ETH/EOS
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Send ETH</th>
-                    <td style={{ textAlign: "left" }}>
-                      <input type="text" required id="buy-input"
-                             placeholder={formatETH(eth_balance.div(WAD))}/>
-                      {" ETH"}
-                      <span style={{ marginLeft: "1.5rem" }}>
-                        <button id="buy-button">
-                          Send ETH
-                        </button>
-                        <span id="buy-progress" className="hidden">
-                          Sending ETH...
-                        </span>
-                      </span>
-                    </td>
-                  </tr>
-                </tbody></table>
-              </form>
-              <form className="hidden pane before-error" id="transfer-pane"
-                    onSubmit={event => (event.preventDefault(), transfer())}>
-                <h3>Transfer EOS tokens to another Ethereum account</h3>
-                <table><tbody>
-                  <tr>
-                    <th>Recipient account</th>
-                    <td style={{ textAlign: "left" }}>
-                      <input placeholder="0x0123456789abcdef0123456789abcdef01234567"
-                             id="transfer-address-input" required
-                             minLength={42} maxLength={42}
-                             style={{ width: "100%" }}/>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Transfer amount</th>
-                    <td style={{ textAlign: "left" }}>
-                      <input placeholder={formatEOS(eos_balance.div(WAD))}
-                             id="transfer-amount-input" required
-                             style={{ width: "15em" }}/>
-                      {" EOS"}
-                      <span style={{ marginLeft: "1rem" }}>
-                        <button id="transfer-button">
-                          Transfer EOS tokens
-                        </button>
-                        <span id="transfer-progress" className="hidden">
-                          Transferring tokens...
-                        </span>
-                      </span>
-                    </td>
-                  </tr>
-                </tbody></table>
-              </form>
-              <div className="pane">
-                <table style={{ width: "100%" }}>
-                  <thead>
-                    <tr>
-                      <th>Window</th>
-                      <th>EOS for sale</th>
-                      <th>Total ETH</th>
-                      <th>Effective price</th>
-                      <th>Closing</th>
-                      <th>Your ETH</th>
-                      <th>Your EOS</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {days.map((day, i) =>
-                      <tr key={i} className={i == Number(today) ? "active" : i < Number(today) ? "closed" : ""}>
-                        <td>
-                          #{day.name}
-                          {i == Number(today) ? "" : ""}
-                        </td>
-                        <td>{formatEOS(day.createOnDay)} EOS</td>
-                        <td>{formatETH(day.dailyTotal)} ETH</td>
-                        <td>{day.dailyTotal == 0 ? "n/a" : (
-                          `${day.price.toFormat(9)} ETH/EOS`
-                        )}</td>
-                        <td>{day.ends.fromNow()}</td>
-                        <td>{formatETH(day.userBuys)} ETH</td>
-                        <td>
-                          {formatEOS(day.received)} EOS
-                          {i >= Number(today)
-                            && <span title="Pending EOS subject to change if additional funds received" style={{ cursor: "pointer" }}> *</span>}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div> :
-              <div className="pane before-error">
-                <h3>Ethereum account not found</h3>
+    It looks like an Ethereum client is available in your
+    browser, but I couldn&rsquo;t find any accounts.
+    If you&rsquo;re using MetaMask, you may need to unlock
+    your account. You can also try disabling and re-enabling
+    the MetaMask plugin by going to <a
+    href="chrome://extensions">chrome://extensions</a>.
 
-                It looks like an Ethereum client is available in your
-                browser, but I couldn&rsquo;t find any accounts.
-                If you&rsquo;re using MetaMask, you may need to unlock
-                your account. You can also try disabling and re-enabling
-                the MetaMask plugin by going to <a
-                href="chrome://extensions">chrome://extensions</a>.
-
-              </div>
-            }
-          </div>
-}
-
+  </div>}
+</div>
 
 function buy() {
   byId("buy-button").classList.add("hidden")
