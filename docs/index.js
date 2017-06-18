@@ -210,11 +210,11 @@ var render = ({
               </a>
             </span> : <span>
               <span style={{ color: "gray" }}>
-                (no EOS public key registered)
+                (no EOS key registered)
               </span>
               <a href="#" id="generate-link" style={{ float: "right" }}
                  onClick={event => (generate(), event.preventDefault())}>
-                Register your EOS key
+                Generate your EOS key
               </a>
             </span>}
           </td>
@@ -264,57 +264,64 @@ var render = ({
         Generating key...
       </span>
       <div id="generate-confirm" className="hidden">
-        <h3>Generate EOS key</h3>
-        Please save the "<b>Private key</b>" below in a safe location before clicking
-        "Continue."  It is good to save the description and public key too for your
-        records.  You should make more than one copy and keep all copies in separate
-        secure locations.  If you use an external storage like a USB drive, make sure you
-        safely eject the device so you know the data is written.
+        <h3>Register EOS key</h3>
 
-        <p>Copy and paste the private key into the field below.  Make your backups.  When you
-        are done click "Continue" ..</p>
+        Please back up the private key displayed below in multiple
+        safe locations before continuing.  You should make more than
+        one copy and keep all copies in separate secure locations.
+        If you use an external storage device such as a USB stick,
+        make sure to safely eject the device before continuing.
 
         <table>
           <tbody>
             <tr>
               <th>Description</th>
               <td style={{textAlign: 'left'}}>
-                EOS Token Sale Claim Key, created {Date().toString()}
+                EOS Token Sale claim key
               </td>
             </tr>
             <tr>
               <th>Public key</th>
               <td style={{textAlign: 'left'}}>
-                <span id="generate-pubkey" style={{width: '30em'}}>&nbsp;</span>
+                <code id="generate-pubkey" style={{ width: "30em" }}></code>
               </td>
             </tr>
             <tr>
               <th>Private key</th>
-              <td style={{textAlign: 'left'}}>
-                <span id="generate-privkey" style={{width: '30em'}}>&nbsp;</span>
+              <td style={{ textAlign: "left" }}>
+                <code id="generate-privkey" style={{ width: "30em" }}></code>
               </td>
             </tr>
             <tr>
-              <th>Confirm Private Key</th>
-              <td style={{textAlign: "left"}}>
+              <th>Confirm private key</th>
+              <td style={{ textAlign: "left" }}>
                 <input name="wif" type="password"
-                  id="generate-confirm-input" style={{width: '30em'}}
+                  id="generate-confirm-input" style={{ width: "30em" }}
                   autoComplete="off"/>
                 <p id="generate-unmatched" className="hidden">
-                  <span style={{color: 'red'}}>
-                    Please check the confirmed key again, it does not match.
-                  </span>
+                  <b style={{ color: "red" }}>
+                    Private key does not match
+                  </b>
                 </p>
               </td>
             </tr>
           </tbody>
         </table>
-        <p>There is <b>no</b> way to recover this private key.  You must save it or
-        your EOS tokens will be delivered to an <b>unclaimable</b> key.</p>
+
+        <p>
+
+          <b>Warning:</b> There is <b>no way</b> to recover your
+          private key.  <b>You must save it right now</b> or you will
+          not be able to access your EOS tokens after the sale ends.
+
+        </p>
+
         <button id="generate-button">
-          Continue: I have saved the "Private Key"
+          I have safely backed up my private key
         </button>
-        <button onClick={generateCancel} style={{ textAlign: "right"}}>Cancel</button>
+        <button onClick={generateCancel} style={{ marginLeft: "1rem" }}>
+          Cancel
+        </button>
       </div>
     </form>
     <form className="hidden pane" id="register-pane"
