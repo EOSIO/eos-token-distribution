@@ -163,11 +163,11 @@ var render = ({
 
     The EOS Token Sale will take place over about 341 days.
     1,000,000,000 (one billion) EOS tokens will be created at the
-    start of the sale, 10% of which are allocated to EOS founders.
+    start of the sale, 10% of which are reserved for EOS founders.
     The other 90% will be split into different rolling windows of
     availability, and the tokens in a given window will be split
     proportionally to all ETH contributions made during that window.
-    20% of the tokens will be sold in a special first window, lasting
+    20% of the tokens will be sold in a special first window lasting
     about five days, while the remaining 70% will be divided equally
     into 365 windows, each lasting 23 hours.  Contributions can be
     made to any future window, and the EOS tokens allocated to a
