@@ -53,7 +53,7 @@ function hidePanes() {
   }
 }
 
-onload = () => setTimeout(() => {
+// onload = () => setTimeout(() => {
   if (!window.web3) {
     byId("app").innerHTML = `
       <div>
@@ -87,7 +87,7 @@ onload = () => setTimeout(() => {
       }
     }))
   }
-}, 500)
+// }, 500)
 
 function refresh() {
   return new Promise((resolve, reject) => {
@@ -108,9 +108,17 @@ function refresh() {
       }) => {
         var startMoment = moment(Number(startTime) * 1000)
 
-        if (!publicKey) {
-          publicKey = null
-          byId("app").addEventListener("mousemove", entropyEvent, {capture: false, passive: true})
+        // Entropy for generating the EOS key.  The key could be added or changed.
+        byId("app").addEventListener("mousemove", entropyEvent, {capture: false, passive: true})
+
+        if (keyChange(publicKey)) {
+          // The key was just changed
+          if(byId("generate-link")) {
+            show("generate-link")
+          }
+          if(byId("register-pane")) {
+            hide("register-pane")
+          }
         }
 
         async.map(iota(Number(days) + 1), (i, $) => {
@@ -203,8 +211,8 @@ var render = ({
           <td style={{ textAlign: "left" }}>
             {publicKey ? <span>
               <code>{publicKey}</code>
-              <a href="#" id="register-link" style={{ float: "right" }}
-                 onClick={event => (event.preventDefault(), showPane('register'))}>
+              <a href="#" id="generate-link" style={{ float: "right" }}
+                 onClick={event => (generate(), event.preventDefault())}>
                 Change your EOS key
               </a>
             </span> : <span>
@@ -263,7 +271,20 @@ var render = ({
         Generating key...
       </span>
       <div id="generate-confirm" className="hidden">
-        <h3>Register EOS key</h3>
+        <h3>{publicKey ? "Change" : "Register"} EOS key</h3>
+
+        {publicKey ? <p>This will replace your EOS claim key:
+          <table>
+            <tbody>
+              <tr>
+                <th>Public key</th>
+                <td style={{textAlign: 'left'}}>
+                  <span style={{width: '30em'}}>{publicKey}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </p> : <span></span>}
 
         <p>Please back up the private key displayed below in multiple
         safe locations before continuing.  You should make more than
@@ -296,7 +317,7 @@ var render = ({
               <td style={{ textAlign: "left" }}>
                 <input name="wif" autoComplete="off"
                   id="generate-confirm-input"
-                  style={{ width: "30em", fontFamily: "monospace" }}
+                  style={{ width: "35em", fontFamily: "monospace" }}
                   />
                 <p id="generate-unmatched" className="hidden">
                   <b style={{ color: "red" }}>
@@ -324,33 +345,24 @@ var render = ({
         </button>
       </div>
     </form>
-    <form className="hidden pane" id="register-pane"
-          onSubmit={event => (event.preventDefault(), register())}>
+    <div className="hidden pane" id="register-pane">
       <h3>{publicKey ? "Change" : "Register"} EOS public key</h3>
-      <table><tbody>
-        <tr>
-          <th>Public key</th>
-          <td style={{ textAlign: "left" }}>
-            {publicKey ? <span>
-              <input //defaultValue={escape(publicKey)}
-                id="register-input" required
-                minLength={33} maxLength={33}
-                style={{ width: "30em", fontFamily: "monospace" }}/>
-            </span> : <span>
-              <span id="generate-pubkey" style={{width: "30em"}}>&nbsp;</span>
-            </span>}
-            <span style={{ marginLeft: "1rem" }}>
-              <button id="register-button">
-                {publicKey ? "Change" : "Register"} key
-              </button>
-              <span id="register-progress" className="hidden">
-                Registering key...
-              </span>
-            </span>
-          </td>
-        </tr>
-      </tbody></table>
-    </form>
+      <table>
+        <tbody>
+          <tr>
+            <th>Public key</th>
+            <td style={{textAlign: 'left'}}>
+              <span id="generate-pubkey" style={{width: '30em'}}>&nbsp;</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <span style={{ marginLeft: "1rem" }}>
+        <span id="register-progress" className="hidden">
+          {publicKey ? "Changing" : "Registering"} key...
+        </span>
+      </span>
+    </div>
     <form className="hidden pane" id="buy-pane"
           onSubmit={event => (event.preventDefault(), buy())}>
       <h3>Buy EOS tokens</h3>
@@ -552,6 +564,7 @@ function generate() {
     hide("generate-progress")
     byId("generate-pubkey").innerHTML = privateKeyPair.pubkey
     byId("generate-privkey").innerHTML = privateKeyPair.privkey
+    byId("generate-confirm-input").value = ""
     show("generate-confirm")
   })
 }
@@ -572,9 +585,11 @@ function generateConfirm() {
     show("generate-unmatched")
     return
   }
+  hide("generate-unmatched")
+  hide('generate-pane')
   byId("generate-pubkey").innerHTML = null
   byId("generate-privkey").innerHTML = null
-  hide('generate-pane')
+  byId("generate-confirm-input").value = null
   show('register-pane')
   register()
 }
@@ -582,24 +597,32 @@ function generateConfirm() {
 function generateCancel(e) {
   e.preventDefault()
   privateKeyPair = null
-  byId("generate-pubkey").innerHTML = null
-  byId("generate-privkey").innerHTML = null
-  hide('generate-pane')
   hide('register-pane')
   show("generate-link")
+  hide('generate-pane')
+  hide("generate-unmatched")
+  byId("generate-pubkey").innerHTML = null
+  byId("generate-privkey").innerHTML = null
+  byId("generate-confirm-input").value = null
 }
 
 function register() {
   const key = privateKeyPair.pubkey
-  byId("register-button").classList.add("hidden")
-  byId("register-progress").classList.remove("hidden")
+  show("register-progress")
   eos_sale.register(key, {
     gas: 1000000,
   }, hopefully(result => ping(result).then(() => {
     hidePanes()
-    byId("register-button").classList.remove("hidden")
-    byId("register-progress").classList.add("hidden")
+    hide("register-progress")
   })))
+}
+
+let lastPublicKey
+
+function keyChange(pubkey) {
+  const changed = (lastPublicKey != pubkey)
+  lastPublicKey = pubkey
+  return changed
 }
 
 function ping(tx) {
