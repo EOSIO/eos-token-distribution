@@ -171,16 +171,25 @@ var render = ({
 
     The EOS Token Sale will take place over about 341 days.
     1,000,000,000 (one billion) EOS tokens will be created at the
-    start of the sale, 10% of which are allocated to the EOS founders.
-    The remaining 90% will be split into different rolling windows of
+    start of the sale, 100,000,000 EOS are allocated to block.one and cannot be
+    transfered.
+
+    The remaining 900,000,000 EOS will be split into different rolling windows of
     availability.  The EOS tokens in a given window will be split
     proportionally to all ETH contributions made during that window.
-    20% will be sold in the first window, lasting about five days.
-    The remaining 70% will be divided equally into 365 windows, each
-    lasting 23 hours.  Contributions can be made to any future window.
+    200,000,000 EOS will be sold in the first window, lasting five days.
+    The remaining 700,000,000 will be divided equally into 350 windows, each
+    lasting 23 hours and distributing 2,000,000 EOS.  Contributions can be made to 
+    any future window, but the EOS cannot be claimed until the window closes.
+
     Once a window closes, the EOS tokens allocated to that window are
     available to be claimed.
 
+    You must generate and register an EOS Public Key or it will not be possible for
+    anyone to include your EOS tokens in the genesis block of any future blockchain's
+    based on EOS.IO software. 
+
+    By sending ETH to this contract you agree to the Terms & Conditions and Purchase Agreement.
   </p>
 
   For more details, please review the token sale <a
@@ -372,7 +381,7 @@ var render = ({
           <td style={{ textAlign: "left" }}>
             <select id="sale-window" value={buyWindow}
                     onChange={e => update({ buyWindow: e.target.value })}>
-              {days.filter((d, i) => i <= Number(today)).map((d, i) => {
+              {days.filter((d, i) => i >= Number(today)).map((d, i) => {
                 return <option key={i} value={i}>Window #{i}</option>
               })}
             </select>
