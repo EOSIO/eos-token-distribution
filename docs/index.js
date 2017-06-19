@@ -381,7 +381,7 @@ var render = ({
           <td style={{ textAlign: "left" }}>
             <select id="sale-window" value={buyWindow}
                     onChange={e => update({ buyWindow: e.target.value })}>
-              {days.filter((d, i) => i >= Number(today)).map((d, i) => {
+              {days.map((d,i) => i).filter((i) => i >= Number(today)).map((i) => {
                 return <option key={i} value={i}>Window #{i}</option>
               })}
             </select>
