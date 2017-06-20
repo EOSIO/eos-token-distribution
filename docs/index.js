@@ -179,7 +179,7 @@ var render = ({
     proportionally to all ETH contributions made during that window.
     200,000,000 EOS will be sold in the first window, lasting five days.
     The remaining 700,000,000 will be divided equally into 350 windows, each
-    lasting 23 hours and distributing 2,000,000 EOS.  Contributions can be made to 
+    lasting 23 hours and distributing 2,000,000 EOS.  Contributions can be made to
     any future window, but the EOS cannot be claimed until the window closes.
 
     Once a window closes, the EOS tokens allocated to that window are
@@ -187,7 +187,7 @@ var render = ({
 
     You must generate and register an EOS Public Key or it will not be possible for
     anyone to include your EOS tokens in the genesis block of any future blockchain's
-    based on EOS.IO software. 
+    based on EOS.IO software.
 
     By sending ETH to this contract you agree to the Terms & Conditions and Purchase Agreement.
   </p>
@@ -381,8 +381,10 @@ var render = ({
           <td style={{ textAlign: "left" }}>
             <select id="sale-window" value={buyWindow}
                     onChange={e => update({ buyWindow: e.target.value })}>
-              {days.filter((d, i) => i >= Number(today)).map((d, i) => {
-                return <option key={i} value={i}>Window #{i}</option>
+              {days.filter(day => day.id >= Number(today)).map(day => {
+                return <option key={day.id} value={day.id}>
+                  Window #{day.id}
+                </option>
               })}
             </select>
           </td>
