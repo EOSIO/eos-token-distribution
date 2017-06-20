@@ -205,7 +205,7 @@ var render = ({
       <table><tbody>
         <tr>
           <th>Ethereum account</th>
-          <td style={{ width: "45rem", textAlign: "left" }}>
+          <td style={{ width: "50rem", textAlign: "left" }}>
             <code>{web3.eth.accounts[0]}</code>
           </td>
         </tr>
@@ -214,6 +214,7 @@ var render = ({
           <td style={{ textAlign: "left" }}>
             {publicKey ? <span>
               <code>{publicKey}</code>
+              {" "}
               <a href="#" id="generate-link" style={{ float: "right" }}
                  onClick={event => (generate(), event.preventDefault())}>
                 Change your EOS key
