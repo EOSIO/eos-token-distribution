@@ -150,7 +150,7 @@ contract EOSSale is DSAuth, DSExec, DSMath {
     }
 
     // Value should be a public key.  Read full key import policy.
-    // Manually registering requires a 33 byte public key base58
+    // Manually registering requires a base58
     // encoded using the STEEM, BTS, or EOS public key format.
     function register(string key) {
         assert(today() <=  numberOfDays + 1);
