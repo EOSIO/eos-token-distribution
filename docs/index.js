@@ -33,13 +33,7 @@ function lament(error) {
 }
 
 function showPane(name) {
-  for (var x of "transfer buy register".split(" ")) {
-    try {
-      show(`${x}-link`)
-      hide(`${x}-pane`)
-    } catch (error) {}
-  }
-
+  hidePanes()
   show(`${name}-pane`)
   hide(`${name}-link`)
 }
