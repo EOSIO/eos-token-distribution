@@ -236,11 +236,11 @@ var render = ({
           <th>Token balances</th>
           <td style={{ textAlign: "left" }}>
             {formatETH(eth_balance.div(WAD))} ETH
-            <a href="#" id="buy-link"
+            {publicKey ? <a href="#" id="buy-link"
                style={{ marginLeft: "1rem", float: "right" }}
                onClick={event => (event.preventDefault(), showPane('buy'))}>
               Buy EOS tokens
-            </a>
+            </a> : <span></span>}
           </td>
         </tr>
         <tr>
