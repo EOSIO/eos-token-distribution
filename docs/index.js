@@ -1,5 +1,6 @@
 //var eos_sale_address_kovan  = "0xda68e806918125abe379e35c46df0e71dfbfeea8"
 //var eos_token_address_kovan = "0x74b279820bdf69bed7e99fd1000df2e1983a5caf"
+/*
 var eos_sale_address_kovan  = "0xc75c91214a4e9c1b8f055e61d8577cd988561b47"
 var eos_token_address_kovan = "0xa49047938b5a3117c22dab31c1be03973b1d2bca"
 var eos_sale, eos_token
@@ -48,9 +49,9 @@ function hidePanes() {
     } catch (error) {}
   }
 }
-
+*/
 // onload = () => setTimeout(() => {
-  if (!window.web3) {
+  /*if (!window.web3) {
     byId("app").innerHTML = `
       <div>
         <div class="pane before-error">
@@ -83,8 +84,9 @@ function hidePanes() {
       }
     }))
   }
-// }, 500)
+// }, 500)*/
 
+/*
 function refresh() {
   return new Promise((resolve, reject) => {
     web3.eth.getBlock("latest", hopefully(block => {
@@ -157,7 +159,7 @@ function refresh() {
       }))
     }))
   })
-}
+}*/
 
 var render = ({
   time, days, unclaimed, today,
@@ -516,6 +518,9 @@ var render = ({
   </div>}
 </div>
 
+ReactDOM.render(render(state), byId("app"))
+
+/*
 function buy() {
   byId("buy-button").classList.add("hidden")
   byId("buy-progress").classList.remove("hidden")
@@ -656,3 +661,4 @@ function update(x) {
   state = Object.assign({}, state, x)
   ReactDOM.render(render(state), byId("app"))
 }
+*/
