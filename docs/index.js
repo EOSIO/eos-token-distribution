@@ -1,3 +1,5 @@
+var state
+
 //var eos_sale_address_kovan  = "0xda68e806918125abe379e35c46df0e71dfbfeea8"
 //var eos_token_address_kovan = "0x74b279820bdf69bed7e99fd1000df2e1983a5caf"
 /*
