@@ -3,6 +3,7 @@ pragma solidity ^0.4.11;
 import "ds-guard/guard.sol";
 import "ds-test/test.sol";
 import 'ds-exec/exec.sol';
+import "gnosis-multisig/MultiSigWallet.sol";
 
 import "./eos.sol";
 
@@ -401,5 +402,65 @@ contract EOSSalePreInitTests is DSTest {
         EOS.setAuthority(new DSGuard());
         EOS.setOwner(sale);
         sale.initialize(EOS);
+    }
+}
+
+contract MultisigUser {
+
+    MultiSigWallet multisig;
+
+    function addMultisig(MultiSigWallet multisig_) {
+        multisig = multisig_;
+    }
+
+    function doConfirm(uint id) {
+        multisig.confirmTransaction(id);
+    }
+}
+
+contract MultisigTests is DSTest {
+    TestableEOSSale  sale;
+    MultisigUser     user1;
+    MultisigUser     user2;
+    MultiSigWallet   multisig;
+
+    function setUp() {
+        string memory x = new string(1);
+
+        sale = new TestableEOSSale(
+            5, 156.25 ether, now, block.timestamp + 1 days, 10 ether, x
+        );
+
+
+        sale.addTime(now + 1);
+
+        user1 = new MultisigUser();
+        user2 = new MultisigUser();
+
+        address[] memory members = new address[](3);
+        members[0] = user1;
+        members[1] = user2;
+        members[2] = this;
+
+        multisig = new MultiSigWallet(members, 2);
+
+        user1.addMultisig(multisig);
+
+    }
+
+    // Ensure that initialize fails if the token has other authorized callers
+    function testRegister() {
+        bytes memory calldata = new bytes(4 + 32);
+        bytes4 sig = bytes4(sha3("register(string)"));
+        calldata[0] = sig[0];
+        calldata[1] = sig[1];
+        calldata[2] = sig[2];
+        calldata[3] = sig[3];
+        calldata[4 + 29] = byte("a");
+        calldata[4 + 30] = byte("b");
+        calldata[4 + 31] = byte("c");
+
+        uint id = multisig.submitTransaction(sale, 0, calldata); // submit and confirm
+        user1.doConfirm(id); // confirm and execute
     }
 }
