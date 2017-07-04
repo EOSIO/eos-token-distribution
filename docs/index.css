@@ -1,0 +1,175 @@
+@font-face {
+  font-family: 'HelveticaNeue';
+  src: url('../fonts/HelveticaNeue.ttf');
+  src: url('../fonts/HelveticaNeue.otf');
+}
+@font-face {
+  font-family: 'HelveticaNeueMedium';
+  src: url('../fonts/HelveticaNeueMedium.ttf');
+  src: url('../fonts/HelveticaNeueMedium.otf');
+}
+@font-face {
+  font-family: 'HelveticaNeueLight';
+  src: url('../fonts/HelveticaNeueLight.ttf');
+  src: url('../fonts/HelveticaNeueLight.otf');
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'HelveticaNeue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  overflow-y: scroll;
+  line-height: 28px;
+  color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: black;
+  background-attachment: fixed;
+  background-position: center center;
+  height:100%;
+}
+body > * {
+  width: 1200px;
+  position: relative;
+}
+
+.pane {
+  padding: 1.5rem 2rem;
+  margin: 1.5rem 0;
+  border-left: none;
+  border-right: none;
+}
+.pane + .pane {
+  border-top: none; margin-top: 0;
+  padding-top: 0;
+}
+
+.pane .info > table th {
+  color: #8D8E90;
+}
+
+.account {
+  background: #1C1D21;
+}
+
+.account .info {
+  display: inline-block;
+}
+
+.account .buttons {
+  position: absolute;
+  right: 0px;
+  display: inline-block;
+  width: 420px;
+  margin-top: 0.5rem;
+  margin-right: 2rem;
+}
+
+.account .buttons > div.row {
+  display: inline-block;
+}
+
+.account .buttons > div.row > div.button {
+  display: inline-block;
+  width: 200px;
+  border: 1px solid #ffffff;
+  text-transform: uppercase;
+  padding: 5px;
+  text-align: center;
+}
+
+.account .buttons > div.row > div.button > a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.sales > table tr > td {
+  border-bottom: 1px groove #8D8E90;
+}
+
+.sales > table th {
+  border-bottom: 1px groove #8D8E90;
+}
+
+.active {
+  background: #1C1D21;
+  font-weight: bold;
+}
+
+.closed {
+  color: gray;
+}
+
+button, input, select {
+  font: inherit;
+  padding: 0rem .25rem;
+}
+
+.hidden {
+  display: none;
+}
+
+button {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+h3 {
+  margin: 0 0 .75rem;
+}
+
+table {
+  text-align: right;
+  border-collapse: collapse;
+}
+
+td, th {
+  padding: .25rem 1rem;
+}
+
+#generate-confirm table > tbody > tr > th {
+  color: #8D8E90;
+}
+
+#generate-pane table > tbody > tr > th {
+  color: #8D8E90;
+}
+
+#buy-pane table > tbody > tr > th {
+  color: #8D8E90;
+}
+
+.account .buttons > div.row > div.button > a.disabled {
+  color: #8D8E90;
+  cursor: not-allowed;
+}
+
+.account .buttons > div.row > div.button.disabled {
+  border: 1px groove #8D8E90;
+  opacity: 0.8;
+}
+
+#sale-window {
+  background: #1C1D21;
+  color: #ffffff;
+  width: 150px;
+  height: 35px;
+  border: none;
+}
+
+input[type='text'] {
+  background: #1C1D21;
+  color: #ffffff;
+  border: none;
+}
+
+button {
+  background: black;
+  color: #ffffff;
+  border: 1px double #ffffff;
+}
