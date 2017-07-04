@@ -128,7 +128,7 @@ function refresh() {
           }
         }
 
-        async.map(iota(Number(days) + 1), (i, $) => {
+        async.map(iota(Number(today) + 1), (i, $) => {
           var day = { id: i }
           eos_sale.createOnDay(day.id, hopefully(createOnDay => {
             eos_sale.dailyTotals(day.id, hopefully(dailyTotal => {
@@ -506,43 +506,6 @@ var render = ({
         </tr>
       </tbody></table>
     </form>
-    <div className="sales pane">
-      <table style={{ width: "100%" }}>
-        <thead>
-          <tr>
-            <th>Period</th>
-            <th>EOS Distributed</th>
-            <th>Total ETH</th>
-            <th>Effective price</th>
-            <th>Closing</th>
-            <th>Your ETH</th>
-            <th>Your EOS</th>
-          </tr>
-        </thead>
-        <tbody>
-          {days.map((day, i) =>
-            <tr key={i} className={i == Number(today) ? "active" : i < Number(today) ? "closed" : ""}>
-              <td>
-                #{day.name}
-                {i == Number(today) ? "" : ""}
-              </td>
-              <td>{formatEOS(day.createOnDay)} EOS</td>
-              <td>{formatETH(day.dailyTotal)} ETH</td>
-              <td>{day.dailyTotal == 0 ? "n/a" : (
-                `${day.price.toFormat(9)} ETH/EOS`
-              )}</td>
-              <td>{day.ends.fromNow()}</td>
-              <td>{formatETH(day.userBuys)} ETH</td>
-              <td>
-                {formatEOS(day.received)} EOS
-                {i >= Number(today)
-                  && <span title="Pending EOS subject to change if additional funds received" style={{ cursor: "pointer" }}> *</span>}
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
   </div> : <div className="pane before-error">
     <h3>Ethereum account not found</h3>
 
