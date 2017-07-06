@@ -645,7 +645,7 @@ let ping = tx => new Promise((resolve, reject) => {
 
 let loaded
 
-setTimeout(() => loaded || location.reload(), 20000)
+setTimeout(() => loaded || location.reload(), 5000)
 
 let poll = async () => {
   await refresh()
