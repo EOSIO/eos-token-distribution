@@ -379,11 +379,9 @@ let render = ({
           <td style={{ textAlign: "left" }}>
             <select id="sale-window" value={buyWindow}
                     onChange={e => update({ buyWindow: e.target.value })}>
-              {days.filter((day, i) => i >= dayFor(time)).map((day, i) => {
-                return <option key={i} value={i}>
-                  Period #{i}
-                </option>
-              })}
+              {days.map((day, i) => <option key={i} value={i}>
+                Period #{i}
+              </option>).filter((day, i) => i >= dayFor(time))}
             </select>
           </td>
         </tr>
@@ -486,7 +484,7 @@ let render = ({
           {days.map((day, i) =>
             <tr key={i} className={i == dayFor(time) ? "active" : i < dayFor(time) ? "closed" : ""}>
               <td>
-                #{day.name}
+                #{i}
                 {i == dayFor(time) ? "" : ""}
               </td>
               <td>{formatEOS(day.createOnDay)} EOS</td>
