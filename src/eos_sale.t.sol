@@ -5,7 +5,7 @@ import "ds-test/test.sol";
 import 'ds-exec/exec.sol';
 import "gnosis-multisig/MultiSigWallet.sol";
 
-import "./eos.sol";
+import "./eos_sale.sol";
 
 contract TestUser is DSExec {
     TestableEOSSale sale;
