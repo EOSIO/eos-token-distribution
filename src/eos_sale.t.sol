@@ -1,8 +1,10 @@
 pragma solidity ^0.4.11;
 
-import "ds-guard/guard.sol";
+import "ds-exec/exec.sol";
 import "ds-test/test.sol";
-import 'ds-exec/exec.sol';
+
+import "ds-guard/guard.sol";
+
 import "gnosis-multisig/MultiSigWallet.sol";
 
 import "./eos_sale.sol";
