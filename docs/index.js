@@ -1,67 +1,60 @@
-var eos_sale_address_main  = "0xd0a6e6c54dbc68db5db3a091b171a77407ff7ccf"
-var eos_token_address_main = "0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0"
+let EOS_SALE        = "0xd0a6e6c54dbc68db5db3a091b171a77407ff7ccf"
+let EOS_SALE_UTIL   = "0x860fd485f533b0348e413e65151f7ee993f93c02"
+let EOS_TOKEN       = "0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0"
 
-var eos_sale, eos_token
+let eos_sale, eos_token
 
-var state
+let startTime       = 1498914000
+let startMoment     = moment(startTime * 1000)
+let numberOfDays    = 350
+let createFirstDay  = WAD * 20000000000
+let createPerDay    = WAD * 200000000
 
-/*
-var kovan = {
-  name: "Kovan",
-  genesis: "0xa3c565fc15c7478862d50ccd6561e3c06b24cc509bf388941c25ea985ce32cb9",
+let createOnDay = day => web3.toBigNumber(
+  day == 0 ? createFirstDay : createPerDay
+)
+
+let getTime = () => new Date().getTime() / 1000
+let dayFor = timestamp => timestamp < startTime ? 0
+  : Math.floor((timestamp - startTime) / 23 / 60 / 60) + 1;
+
+let state = {
+  buyWindow: dayFor(getTime()),
 }
 
-var chain = kovan
-*/
+let balanceOf = async (token, address) => web3.toBigNumber(hex(await call({
+  to: token, data: calldata(sighash("balanceOf(address)"), address)
+})))
 
-var WAD = 1000000000000000000
+let getDailyTotals = async () => words32(await call({
+  to: EOS_SALE_UTIL, data: sighash("dailyTotals()"),
+})).map(web3.toBigNumber)
 
-var hopefully = $ => (error, result) => {
-  if (error) {
-    lament(error)
+let getUserBuys = async address => words32(await call({
+  to: EOS_SALE_UTIL, data: calldata(sighash("userBuys()"), address),
+})).map(web3.toBigNumber)
+
+let getUserClaims = async address => words32(await call({
+  to: EOS_SALE_UTIL, data: calldata(sighash("userClaims()"), address),
+})).map(Number).map(Boolean)
+
+let getKey = async address => bytes(
+  words32(await call({
+    to: EOS_SALE, data: calldata(sighash("keys(address)"))
+  })).slice(2).map(unhex).join("").replace(/(00)*$/, "")
+).map(Number).map(String.fromCharCode).join("")
+
+addEventListener("mousemove", event => eos_ecc.key_utils.addEntropy(
+  event.pageX, event.pageY, event.screenX, event.screenY
+), { capture: false, passive: true })
+
+onload = () => {
+  if (window.web3) {
+    eos_sale  = web3.eth.contract(EOS_SALE_ABI).at(EOS_SALE)
+    eos_token = web3.eth.contract(EOS_TOKEN_ABI).at(EOS_TOKEN)
+
+    poll()
   } else {
-    $(result)
-  }
-}
-
-function lament(error) {
-  if (error) {
-    document.querySelector(".before-error").outerHTML += `
-      <div class="error pane">
-        <h3>${error.message}</h3>
-        <pre>${error.stack}</pre>
-      </div>
-    `
-  }
-}
-
-function showPane(name) {
-  hidePanes()
-  show(`${name}-pane`)
-  disable(`${name}-link`)
-}
-
-function hidePanes() {
-  for (var x of "generate transfer buy register".split(" ")) {
-    try {
-      enable(`${x}-link`)
-      hide(`${x}-pane`)
-    } catch (error) {}
-  }
-}
-
-function enable(id) {
-  byId(id).classList.remove("disabled");
-  byId(id).parentNode.classList.remove("disabled");
-}
-
-function disable(id) {
-  byId(id).classList.add("disabled");
-  byId(id).parentNode.classList.add("disabled");
-}
-
-// onload = () => setTimeout(() => {
-  if (!window.web3) {
     byId("app").innerHTML = `
       <div>
         <div class="pane before-error">
@@ -82,97 +75,67 @@ function disable(id) {
         </div>
       </div>
     `
-  } else {
-    eos_sale  = web3.eth.contract(eos_sale_abi).at(eos_sale_address_main)
-    eos_token = web3.eth.contract(eos_token_abi).at(eos_token_address_main)
-
-    web3.eth.getBlock(0, hopefully(block => {
-      //if (block.hash == chain.genesis) {
-        poll()
-      //} else {
-      //  lament(new Error(`Wrong blockchain; please use ${chain.name}`))
-      //}
-    }))
   }
-// }, 500)
-
-function refresh() {
-  return new Promise((resolve, reject) => {
-    web3.eth.getBlock("latest", hopefully(block => {
-      var time = block.timestamp
-
-      async.parallel(Object.assign({
-        today: $ => eos_sale.dayFor(time, $),
-        days: $ => eos_sale.numberOfDays($),
-        startTime: $ => eos_sale.startTime($),
-      }, web3.eth.accounts[0] ? {
-        eth_balance: $ => web3.eth.getBalance(web3.eth.accounts[0], $),
-        eos_balance: $ => eos_token.balanceOf(web3.eth.accounts[0], $),
-        publicKey: $ => eos_sale.keys(web3.eth.accounts[0], $),
-      } : {}), hopefully(({
-        today, days, startTime,
-        eth_balance, eos_balance, publicKey,
-      }) => {
-        var startMoment = moment(Number(startTime) * 1000)
-
-        // Entropy for generating the EOS key.  The key could be added or changed.
-        byId("app").addEventListener("mousemove", entropyEvent, {capture: false, passive: true})
-
-        if (keyChange(publicKey)) {
-          // The key was just changed
-          if(byId("generate-link")) {
-            enable("generate-link")
-          }
-          if(byId("register-pane")) {
-            hide("register-pane")
-          }
-        }
-
-        async.map(iota(Number(today) + 1), (i, $) => {
-          var day = { id: i }
-          eos_sale.createOnDay(day.id, hopefully(createOnDay => {
-            eos_sale.dailyTotals(day.id, hopefully(dailyTotal => {
-              eos_sale.userBuys(day.id, web3.eth.accounts[0], hopefully(userBuys => {
-                day.name = day.id
-                day.createOnDay = createOnDay.div(WAD)
-                day.dailyTotal = dailyTotal.div(WAD)
-                day.userBuys = userBuys.div(WAD)
-                day.price = dailyTotal.div(createOnDay)
-                day.received = day.dailyTotal.equals(0) ? web3.toBigNumber(0) : day.createOnDay.div(day.dailyTotal).times(day.userBuys)
-
-                if (day.id == 0) {
-                  day.ends = startMoment
-                } else {
-                  day.begins = startMoment.clone().add(23 * (day.id - 1), "hours")
-                  day.ends = day.begins.clone().add(23, "hours")
-                }
-
-                eos_sale.claimed(day.id, web3.eth.accounts[0], hopefully(claimed => {
-                  day.claimed = claimed
-
-                  $(null, day)
-                }))
-              }))
-            }))
-          }))
-        }, hopefully(days => {
-          var unclaimed = days.filter((x, i) => {
-            return i < Number(today) && !x.claimed
-          }).reduce((a, x) => x.received.plus(a), web3.toBigNumber(0))
-
-          resolve(update({
-            time, days, unclaimed, today, eth_balance, eos_balance, publicKey,
-            ...(state ? { } : { buyWindow: today }),
-          }))
-        })) 
-      }))
-    }))
-  })
 }
 
-var render = ({
-  time, days, unclaimed, today,
-  eth_balance, eos_balance, publicKey, buyWindow,
+let refresh = () => new Promise(resolve => async.parallel(Object.assign({
+  dailyTotals: toAsync(getDailyTotals()),
+}, web3.eth.accounts[0] ? {
+  eth_balance: $ => web3.eth.getBalance(web3.eth.accounts[0], $),
+  eos_balance: toAsync(balanceOf(EOS_TOKEN, web3.eth.accounts[0])),
+  publicKey:   toAsync(getKey(web3.eth.accounts[0])),
+  userBuys:    toAsync(getUserBuys(web3.eth.accounts[0])),
+  userClaims:  toAsync(getUserClaims(web3.eth.accounts[0])),
+} : {}), hopefully(({
+  dailyTotals, eth_balance, eos_balance, publicKey, userBuys, userClaims,
+}) => {
+  let time = getTime()
+
+  if (keyChange(publicKey)) {
+    if (byId("generate-link")) {
+      enable("generate-link")
+    }
+    if (byId("register-pane")) {
+      hide("register-pane")
+    }
+  }
+
+  let days = iota(Number(numberOfDays) + 1).map(i => {
+    let day = {}
+
+    day.createOnDay = createOnDay(i).div(WAD)
+    day.dailyTotal  = dailyTotals[i].div(WAD)
+    
+    day.price = day.dailyTotal.div(day.createOnDay)
+
+    day.userBuys = userBuys[i] && userBuys[i].div(WAD)
+    day.received = !day.userBuys || day.dailyTotal.equals(0)
+      ? web3.toBigNumber(0)
+      : day.createOnDay.div(day.dailyTotal).times(day.userBuys)
+
+    if (i == 0) {
+      day.ends = startMoment
+    } else {
+      day.begins = startMoment.clone().add(23 * (i - 1), "hours")
+      day.ends = day.begins.clone().add(23, "hours")
+    }
+
+    day.claimed = userClaims && userClaims[i]
+
+    return day
+  })
+
+  let unclaimed = days.filter((x, i) => {
+    return i < dayFor(time) && !x.claimed
+  }).reduce((a, x) => x.received.plus(a), web3.toBigNumber(0))
+
+  resolve(update({
+    time, days, unclaimed, eth_balance, eos_balance, publicKey
+  }))
+})))
+
+let render = ({
+  time, days, unclaimed, eth_balance, eos_balance, publicKey, buyWindow,
 }) => <div>
   <p className="hidden" style={{ width: "95%" }}>
 
@@ -222,7 +185,7 @@ var render = ({
         <tr>
           <th>Contract address</th>
           <td style={{ textAlign: "left" }}>
-            {eos_sale_address_main}
+            {EOS_SALE}
           </td>
         </tr>
         <tr>
@@ -416,9 +379,9 @@ var render = ({
           <td style={{ textAlign: "left" }}>
             <select id="sale-window" value={buyWindow}
                     onChange={e => update({ buyWindow: e.target.value })}>
-              {days.filter(day => day.id >= Number(today)).map(day => {
-                return <option key={day.id} value={day.id}>
-                  Period #{day.id}
+              {days.filter((day, i) => i >= dayFor(time)).map((day, i) => {
+                return <option key={i} value={i}>
+                  Period #{i}
                 </option>
               })}
             </select>
@@ -506,6 +469,43 @@ var render = ({
         </tr>
       </tbody></table>
     </form>
+    <div className="sales pane">
+      <table style={{ width: "100%" }}>
+        <thead>
+          <tr>
+            <th>Period</th>
+            <th>EOS Distributed</th>
+            <th>Total ETH</th>
+            <th>Effective price</th>
+            <th>Closing</th>
+            <th>Your ETH</th>
+            <th>Your EOS</th>
+          </tr>
+        </thead>
+        <tbody>
+          {days.map((day, i) =>
+            <tr key={i} className={i == dayFor(time) ? "active" : i < dayFor(time) ? "closed" : ""}>
+              <td>
+                #{day.name}
+                {i == dayFor(time) ? "" : ""}
+              </td>
+              <td>{formatEOS(day.createOnDay)} EOS</td>
+              <td>{formatETH(day.dailyTotal)} ETH</td>
+              <td>{day.dailyTotal == 0 ? "n/a" : (
+                `${day.price.toFormat(9)} ETH/EOS`
+              )}</td>
+              <td>{day.ends.fromNow()}</td>
+              <td>{formatETH(day.userBuys)} ETH</td>
+              <td>
+                {formatEOS(day.received)} EOS
+                {i >= dayFor(time)
+                  && <span title="Pending EOS subject to change if additional funds received" style={{ cursor: "pointer" }}> *</span>}
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
   </div> : <div className="pane before-error">
     <h3>Ethereum account not found</h3>
 
@@ -522,7 +522,7 @@ var render = ({
 function buy() {
   byId("buy-button").classList.add("hidden")
   byId("buy-progress").classList.remove("hidden")
-  var amount = getValue("buy-input").replace(/,/g, "")
+  let amount = getValue("buy-input").replace(/,/g, "")
   eos_sale.buyWithLimit(state.buyWindow, 0, {
     value: web3.toWei(amount)
   }, hopefully(result =>
@@ -550,21 +550,15 @@ function claim() {
 function transfer() {
   byId("transfer-button").classList.add("hidden")
   byId("transfer-progress").classList.remove("hidden")
-  var guy = getValue("transfer-address-input")
-  var wad = getValue("transfer-amount-input").replace(/,/g, "") * WAD
+  let guy = getValue("transfer-address-input")
+  let wad = web3.toBigNumber(
+    getValue("transfer-amount-input").replace(/,/g, "")
+  ).times(WAD)
   eos_token.transfer(guy, wad, hopefully(result => ping(result).then(() => {
     hidePanes()
     byId("transfer-button").classList.remove("hidden")
     byId("transfer-progress").classList.add("hidden")
   })))
-}
-
-function entropyEvent(e) {
-  var {key_utils} = eos_ecc
-  if(e.type === 'mousemove')
-      key_utils.addEntropy(e.pageX, e.pageY, e.screenX, e.screenY)
-  else
-      console.log('onEntropyEvent Unknown', e.type, e)
 }
 
 function generate() {
@@ -584,10 +578,10 @@ function generate() {
 let privateKeyPair = null
 
 function genKeyPair() {
-  var {PrivateKey} = eos_ecc
-  var d = PrivateKey.randomKey()
-  var privkey = d.toWif()
-  var pubkey = d.toPublic().toString()
+  let {PrivateKey} = eos_ecc
+  let d = PrivateKey.randomKey()
+  let privkey = d.toWif()
+  let pubkey = d.toPublic().toString()
   return {pubkey, privkey}
 }
 
@@ -637,26 +631,26 @@ function keyChange(pubkey) {
   return changed
 }
 
-function ping(tx) {
-  return new Promise((resolve, reject) => {
-    function f() {
-      web3.eth.getTransactionReceipt(
-        tx, (err, x) => x ? refresh().then(() => resolve(x))
-          : setTimeout(f, 1000))
-    }
-    f()
-  })
-}
+let ping = tx => new Promise((resolve, reject) => {
+  loop()
+  function loop() {
+    web3.eth.getTransactionReceipt(tx, async (error, receipt) => {
+      if (receipt) {
+        await refresh()
+        resolve(receipt)
+      } else {
+        setTimeout(loop, 1000)
+      }
+    })
+  }
+})
 
-var loaded
+let loaded
 
 setTimeout(() => loaded || location.reload(), 20000)
 
-function poll() {
-  refresh().then(() => (loaded = true, setTimeout(poll, 10000)))
-}
-
-function update(x) {
-  state = Object.assign({}, state, x)
-  ReactDOM.render(render(state), byId("app"))
+let poll = async () => {
+  await refresh()
+  loaded = true
+  setTimeout(poll, 10000)
 }
