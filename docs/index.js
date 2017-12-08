@@ -219,11 +219,17 @@ var render = ({
               <td style={{textAlign: 'left'}}>
                 <code id="generate-pubkey" style={{ width: "30em" }}></code>
               </td>
+              <td style={{textAlign: 'left'}}>
+                <code id="generate-pubkey-error" style={{ width: "30em" }}></code>
+              </td>
             </tr>
             <tr>
               <th>Private key</th>
               <td style={{ textAlign: "left" }}>
                 <code id="generate-privkey" style={{ width: "30em" }}></code>
+              </td>
+              <td style={{ textAlign: "left" }}>
+                <code id="generate-privkey-error" style={{ width: "30em" }}></code>
               </td>
             </tr>
 
@@ -252,17 +258,44 @@ function generate() {
         privateKeyPair = genKeyPair()
         hide("generate-progress")
         byId("generate-pubkey").innerHTML = privateKeyPair.pubkey
+        byId("generate-pubkey-error").innerHTML = privateKeyPair.pubkeyError
         byId("generate-privkey").innerHTML = privateKeyPair.privkey
+        byId("generate-privkey-error").innerHTML = privateKeyPair.privkeyError
         show("generate-confirm")
     })
 }
 
 function genKeyPair() {
-    var {PrivateKey} = eos_ecc
+    var {PrivateKey, PublicKey} = eos_ecc
     var d = PrivateKey.randomKey()
     var privkey = d.toWif()
     var pubkey = d.toPublic().toString()
-    return {pubkey, privkey}
+
+    var pubkeyError = null
+    try {
+      PublicKey.fromStringOrThrow(pubkey)
+    } catch(error) {
+      console.log('pubkeyError', error, pubkey)
+      pubkeyError = error.message + ' => ' + pubkey
+    }
+
+    var privkeyError = null
+    try {
+      var pub2 = PrivateKey.fromWif(privkey).toPublic().toString()
+      if(pubkey !== pub2) {
+        throw {message: 'public key miss-match: ' + pubkey + ' !== ' + pub2}
+      }
+    } catch(error) {
+      console.log('privkeyError', error, privkey)
+      privkeyError = error.message + ' => ' + privkey
+    }
+
+    if(privkeyError || pubkeyError) {
+      privkey = 'DO NOT USE'
+      pubkey = 'DO NOT USE'
+    }
+
+    return {pubkey, privkey, pubkeyError, privkeyError}
 }
 
 function showPane(name) {
