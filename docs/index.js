@@ -163,7 +163,8 @@ var render = ({
 
   </p>
   Source code can be reviewed here: <a href="https://github.com/Nadejde/eos-token-sale">https://github.com/Nadejde/eos-token-sale</a>.
-
+  <br />
+  <strong> If you found this helpful please consider making a small donation: 0x0bbe518debf97fb2e27d955b050cbd1e8ca90264 </strong>
   <div>
     <div className="pane">
       <table><tbody>
