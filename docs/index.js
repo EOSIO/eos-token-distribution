@@ -165,7 +165,9 @@ var render = ({
   Source code can be reviewed here: <a href="https://github.com/Nadejde/eos-token-sale">https://github.com/Nadejde/eos-token-sale</a>.
   <br />
   <br />
-  <strong> If you found this helpful please consider making a small donation (ETH): 0x0bbe518debf97fb2e27d955b050cbd1e8ca90264 </strong>
+  <strong> If you found this helpful please consider making a small donation <br />
+  ETH: 0x0bbe518debf97fb2e27d955b050cbd1e8ca90264 <br />
+  EOS: gqztenjzgege </strong>
   <div>
     <div className="pane">
       <table><tbody>
